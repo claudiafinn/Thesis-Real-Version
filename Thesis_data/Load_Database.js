@@ -4,13 +4,13 @@ var fs = require( 'fs' );
 var sql = require( 'sqlite3' ).verbose();
 var db = new sql.Database( 'thesis_data.sqlite' );
 
-if( process.argv.length < 3 ){
+if( process.argv.length < 4 ){
     console.log( "Usage: Need a filename, dummy" );
     process.exit( 1 );
 }
 
 var filename = process.argv[ 2 ];
-
+var year = process.argv[ 3 ];
 console.log( "You want me to read file: ", filename );
 
 try{
@@ -21,29 +21,33 @@ catch( exp ){
     process.exit( 2 );
 }
 
+//**Start real shit
+//
+//**
+var categories = ["YEAR","PUMA", "SERIALNO","ADJHSG", "ADJINC", "FS","RNTP","VACS","VALP","YBL","FINCP","HHL","HINCP","MV","TAXP","WORKSTAT"];//etc
+var pumas = ["812","813"];//etc
+
 var contents = fileBuffer.toString();
-var contents_lines = contents.split( '?' );
+var contents_lines = contents.split( '\n' );
 
-var columns=contents_lines[0].split(',');
-var type=" INTEGER "
+
+//create sqlite string for categories
 var data="(";
-
-for (var i=0; i<columns.length;i++){
-  if(columns[i]=="WORKSTAT"){
-    data+="'"+columns[i] +"'";
-    data+="INTEGER";
-    break;
+for (var i=0; i< categories.length; i++){
+  if(i==categories.length-1){
+    data+=categories[i];
   }
   else{
-    data+="'"+columns[i] +"'";
-    data+="INTEGER";
-    data+=",";
+    data+=categories[i]+",";
   }
 }
-data+= ")";
+data+=")";
+console.log(data);
 
-//db.run("DROP TABLE House_Data", function(err){});
-db.run("CREATE TABLE IF NOT EXISTS House_Data "+data,
+
+//**create table
+//db.run("DROP TABLE House_Data2", function(err){});
+db.run("CREATE TABLE IF NOT EXISTS House_Data2 "+data,
   function(err){
     console.log("1"+err)
       //res.writeHead( 200 );
@@ -51,27 +55,46 @@ db.run("CREATE TABLE IF NOT EXISTS House_Data "+data,
       //res.end( "added " + resp_text );
   });
 
+//find corresponding indexes to categories
+var indexes =[];
+var something =contents_lines[0].split(',');
+for (var k=0; k<categories.length; k++){
+  for (var m=0; m<something.length; m++){
+    if (something[m] == categories[k]){
+      indexes.push(m);
+      console.log(m);
 
-for( var i = 1; i < contents_lines.length-1; i++ )
-{
-  var vals=contents_lines[i].split(',');
-  var input="(";
-
-  for (var j= 0; j< vals.length-2; j++){
-    if(vals[j]=="NULL" | vals[j]==""){input+="NULL, "; }
-    else{ input+= parseInt(vals[j]) +", "; }
+    }
   }
-  //TODO not good
-  if(vals[31]=="NULL" | vals[31]==""){input+="NULL)"}
-  else{input+=vals[31]+")";}
-  console.log(input);
+}
 
-  db.run("INSERT INTO House_Data VALUES "+input,
-        function(err){
-          console.log("2"+err)
-            //res.writeHead( 200 );
-            resp_text = "";
-            //res.end( "added " + resp_text );
-    });
+//does this for every line in the file
+for( var i = 0; i < contents_lines.length-1; i++ )
+{
+//  var year="2008";
+  var vals=contents_lines[i].split(',');
+  var input="("+year+",";
 
+  for ( var j = 0; j <indexes.length; j++){
+    var data = vals[indexes[j]];
+    if (data==""){
+      data="NULL"
+    }
+    if (j==indexes.length-1){
+        input+=data;
+    }
+    else{
+      input+=data+",";
+    }
+  }
+
+input+=")";
+console.log(input);
+db.run("INSERT INTO House_Data2 VALUES "+input,
+      function(err){
+        console.log("2"+err)
+          //res.writeHead( 200 );
+          resp_text = "";
+          //res.end( "added " + resp_text );
+  });
 }

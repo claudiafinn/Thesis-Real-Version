@@ -22,7 +22,8 @@ function getFormValuesFromURL( url )
 
 function serveFile( req, res )
 {
-    var filename = "./" + req.url;
+    var filename = "./Thesis_2/" + req.url;
+    //var filename = "./" + req.url;
     try {
         var contents = fs.readFileSync( filename ).toString();
         res.writeHead( 200 );
@@ -44,17 +45,19 @@ function serveDynamic( req, res )
         var more_parts=url_parts[1].split('&');
         var puma = more_parts[0].split('=')[1];
         var year = more_parts[1].split('=')[1];
+        var category = more_parts[2].split('=')[1];
         var data=""
-        console.log(puma, year);
-        var db = new sql.Database( 'thesis_data.sqlite' );
-        db.all( "SELECT SERIALNO FROM House_Data WHERE PUMA =? AND YEAR = ?",[puma, year],
+        console.log(puma, year, category);
+        var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
+        db.all( "SELECT ? FROM House_Data2 WHERE PUMA =? AND YEAR = ?",[category, puma, year],
               function( err, rows ) {
                   if(err){ console.log(err);}
                   for( var i = 0; i < rows.length; i++ )
                   {
-
-                    data=data+(rows[i].SERIALNO)+",";
+                    console.log(rows[i]);
+                    data=data+(rows[i].category)+",";
                   }
+                  console.log(rows.length);
                   res.writeHead( 200 );
                   res.end( ""+data );
                 } );
@@ -67,11 +70,12 @@ function serveDynamic( req, res )
         res.writeHead( 200 );
         res.end( ""+data );
     }
+
     else if( req.url.indexOf( "load?" ) >= 0 )
     {
-      var db = new sql.Database( 'thesis_data.sqlite' );
+      var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
       var pumas =[]
-      db.all( "SELECT PUMA FROM House_Data",
+      db.all( "SELECT PUMA FROM House_Data2",
             function( err, rows ) {
                 if(err){ console.log(err);}
                 for( var i = 0; i < rows.length; i++ )
@@ -81,14 +85,15 @@ function serveDynamic( req, res )
                       console.log(parseInt(rows[i].PUMA))
                   }
                 }
-               var jsonData ={}
-               jsonData.puma_list=pumas;
+              var jsonData ={}
+              jsonData.puma_list=pumas;
               res.writeHead( 200 );
               console.log(jsonData);
-              //res.write()
+              //sends json data to client
               res.end( JSON.stringify(jsonData ));
               } );
     }
+    
     else
     {
         res.writeHead( 404 );
@@ -112,5 +117,4 @@ function serverFun( req, res )
 }
 
 var server = http.createServer( serverFun );
-
 server.listen( 8080 );
