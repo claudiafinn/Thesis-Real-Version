@@ -1,8 +1,11 @@
 var fs   = require( 'fs' );
 var http = require( 'http' );
 var sql = require( 'sqlite3' ).verbose();
-
+var serveStatic = require('serve-static');
 //var the_num = 0;
+
+
+//async library
 
 function getFormValuesFromURL( url )
 {
@@ -20,27 +23,20 @@ function getFormValuesFromURL( url )
     return kvs
 }
 
-function serveFile( req, res )
-{
-    var filename = "./Thesis_2/" + req.url;
-    //var filename = "./" + req.url;
-    try {
-        var contents = fs.readFileSync( filename ).toString();
-        res.writeHead( 200 );
-        res.end( contents );
-        return true;
-    }
-    catch( exp ) {
-        return false;
-    }
-}
+//my code compile repo ben
+//serveStatic library node will do all this
+
 
 function serveDynamic( req, res )
 {
   //  var kvs = getFormValuesFromURL( req.url );
-
+    console.log(req.url);
     if( req.url.indexOf( "getData?" ) >= 0 )
     {
+        //library that does this for me - node qs
+        //url encoding/decoding
+        //var qs = require ('query-string'
+       //code compile ben)
         var url_parts = req.url.split('?');
         var more_parts=url_parts[1].split('&');
         var puma = more_parts[0].split('=')[1];
@@ -49,15 +45,18 @@ function serveDynamic( req, res )
         var data=""
         console.log(puma, year, category);
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
-        db.all( "SELECT ? FROM House_Data2 WHERE PUMA =? AND YEAR = ?",[category, puma, year],
+        var temp = "SERIALNO";
+        //db.all( "SELECT ? FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[category, parseInt(puma), parseInt(year)],
+        //don;t leave this like this
+        db.all( "SELECT "+category+" FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[ puma, year],
               function( err, rows ) {
                   if(err){ console.log(err);}
                   for( var i = 0; i < rows.length; i++ )
                   {
-                    console.log(rows[i]);
-                    data=data+(rows[i].category)+",";
+                  //  console.log(rows[i][category]);
+                    data=data+(rows[i][category])+",";
                   }
-                  console.log(rows.length);
+                  //console.log(rows.length);
                   res.writeHead( 200 );
                   res.end( ""+data );
                 } );
@@ -82,18 +81,18 @@ function serveDynamic( req, res )
                 {
                   if(pumas.indexOf(parseInt(rows[i].PUMA))==-1){
                       pumas.push(parseInt(rows[i].PUMA))
-                      console.log(parseInt(rows[i].PUMA))
+                    //  console.log(parseInt(rows[i].PUMA))
                   }
                 }
               var jsonData ={}
               jsonData.puma_list=pumas;
               res.writeHead( 200 );
-              console.log(jsonData);
+            //  console.log(jsonData);
               //sends json data to client
               res.end( JSON.stringify(jsonData ));
               } );
     }
-    
+
     else
     {
         res.writeHead( 404 );
@@ -101,20 +100,11 @@ function serveDynamic( req, res )
     }
 }
 
-function serverFun( req, res )
-{
-    // console.log( req );
-    console.log( "The URL: '", req.url, "'" );
-    if( req.url === "/" || req.url === "/index.htm" )
-    {
-        req.url = "/index.html";
-    }
-    var file_worked = serveFile( req, res );
-    if( file_worked )
-        return;
+var serveFiles = serveStatic( './Thesis_2/' , {'index ' : [ 'index.html', 'index.htm']});
 
-    serveDynamic( req, res );
+function onRequest(req, res){
+  serveFiles( req, res, function() {  serveDynamic( req, res ); ;});
 }
 
-var server = http.createServer( serverFun );
+var server = http.createServer( onRequest );
 server.listen( 8080 );
