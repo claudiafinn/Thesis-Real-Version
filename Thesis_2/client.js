@@ -3,8 +3,6 @@
 var oneYear = true;
 function onPageLoad()
 {
-    //TODO make xhr's that get the puma and years from db
-    //and populate drop down lists with them
     console.log('hi');
     var xhr = new XMLHttpRequest();
     xhr.addEventListener( "load", onLoadResponse );
@@ -69,6 +67,7 @@ function getResultsOne(){
   var xhr = new XMLHttpRequest();
   xhr.addEventListener( "load", onResponse );
   xhr.open( "get", "getData?puma="+drop1select+"&year="+drop2select+"&category="+drop3select, true );
+
   xhr.send();
 }
 
@@ -108,6 +107,7 @@ function addYear(){
   var div = document.getElementById( 'year_container' );
   var button = document.getElementById( 'add_year' );
   var new_select=document.createElement('select');
+  new_select.className="form-control";
   new_select.options.add( new Option("2008") );
   new_select.options.add( new Option("2009") );
   new_select.options.add( new Option("2010") );

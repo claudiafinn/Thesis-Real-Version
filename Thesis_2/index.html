@@ -91,7 +91,23 @@
                 <div class="col-lg-10 col-lg-offset-1">
                     <h2>Our Services</h2>
                     <hr class="small">
-                    <div class="row">
+                    <form class="form-inline">
+                      <div class="form-group" id ="year_container">
+                        <label for="exampleInputEmail2">Year : </label>
+                        <select id="year_select" class="form-control"></select>
+                        <input type="button" class="btn" id="add_year" onclick="addYear()"> </button>
+                      </div>
+                      <div class="form-group" id="puma_container">
+                        <label for="exampleInputEmail2">Neighborhood</label>
+                        <select id = "puma_select" class="form-control">Puma</select>
+                      </div>
+                      <div class="form-group" id="category_container">
+                        <label for="exampleInputEmail2">Category</label>
+                        <select id = "category_select" class="form-control">Category</select>
+                        <input type="button" class="btn btn-default" onclick="getResults()">Submit</button>
+                    </div>
+                  </form>
+                  <!--  <div class="row">
                         <div class="col-md-3 col-sm-6">
                             <div id ="year_container">
                               <select id = "year_select">Year</select>
@@ -111,7 +127,7 @@
                         <div class="col-md-3 col-sm-6">
                             <button id="button1" onclick="getResults()">Button</button>
                         </div>
-                    </div>
+                    </div>-->
                     <!-- /.row (nested) -->
                 </div>
                 <!-- /.col-lg-10 -->
@@ -141,28 +157,12 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-10 col-lg-offset-1 text-center">
-                    <h4><strong>Start Bootstrap</strong>
+                    <h4><strong>Capstone Project 2015/2016</strong>
                     </h4>
-                    <p>3481 Melrose Place<br>Beverly Hills, CA 90210</p>
-                    <ul class="list-unstyled">
-                        <li><i class="fa fa-phone fa-fw"></i> (123) 456-7890</li>
-                        <li><i class="fa fa-envelope-o fa-fw"></i>  <a href="mailto:name@example.com">name@example.com</a>
-                        </li>
-                    </ul>
+                    <p>Claudia M. Finn</p>
                     <br>
-                    <ul class="list-inline">
-                        <li>
-                            <a href="#"><i class="fa fa-facebook fa-fw fa-3x"></i></a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fa fa-twitter fa-fw fa-3x"></i></a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fa fa-dribbble fa-fw fa-3x"></i></a>
-                        </li>
-                    </ul>
                     <hr class="small">
-                    <p class="text-muted">Copyright &copy; Your Website 2014</p>
+                    <p class="text-muted">Copyright &copy; Claudia Finn 2015</p>
                 </div>
             </div>
         </div>

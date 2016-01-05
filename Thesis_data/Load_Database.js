@@ -31,7 +31,7 @@ var contents = fileBuffer.toString();
 var contents_lines = contents.split( '\n' );
 
 
-//create sqlite string for categories
+//create sqlite string for categories (labels for the db)
 var data="(";
 for (var i=0; i< categories.length; i++){
   if(i==categories.length-1){
@@ -55,7 +55,10 @@ db.run("CREATE TABLE IF NOT EXISTS House_Data2 "+data,
       //res.end( "added " + resp_text );
   });
 
-//find corresponding indexes to categories
+//***find corresponding indexes to categories
+//for each category that exists in the master, save the index of that category but in the order
+//of the original list
+//eg. indexes are ordered according to master list
 var indexes =[];
 var something =contents_lines[0].split(',');
 for (var k=0; k<categories.length; k++){
@@ -75,6 +78,8 @@ for( var i = 0; i < contents_lines.length-1; i++ )
   var vals=contents_lines[i].split(',');
   var input="("+year+",";
 
+
+  //retrieve the data fro the proper index
   for ( var j = 0; j <indexes.length; j++){
     var data = vals[indexes[j]];
     if (data==""){

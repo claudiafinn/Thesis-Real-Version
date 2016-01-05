@@ -4,7 +4,6 @@ var sql = require( 'sqlite3' ).verbose();
 var serveStatic = require('serve-static');
 //var the_num = 0;
 
-
 //async library
 
 function getFormValuesFromURL( url )
@@ -47,16 +46,15 @@ function serveDynamic( req, res )
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
         var temp = "SERIALNO";
         //db.all( "SELECT ? FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[category, parseInt(puma), parseInt(year)],
-        //don;t leave this like this
+
+        //problems : sqlite select statement is not safe
         db.all( "SELECT "+category+" FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[ puma, year],
               function( err, rows ) {
                   if(err){ console.log(err);}
                   for( var i = 0; i < rows.length; i++ )
                   {
-                  //  console.log(rows[i][category]);
                     data=data+(rows[i][category])+",";
                   }
-                  //console.log(rows.length);
                   res.writeHead( 200 );
                   res.end( ""+data );
                 } );
