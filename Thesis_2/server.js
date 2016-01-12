@@ -85,8 +85,6 @@ function serveDynamic( req, res )
               var jsonData ={}
               jsonData.puma_list=pumas;
               res.writeHead( 200 );
-            //  console.log(jsonData);
-              //sends json data to client
               res.end( JSON.stringify(jsonData ));
               } );
     }
