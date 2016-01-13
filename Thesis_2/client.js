@@ -3,17 +3,40 @@
 var oneYear = true;
 function onPageLoad()
 {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = "https://maps.googleapis.com/maps/api/js?key=" + "AIzaSyDSZEk1qVzdKWLeQqFQBcpIl_ezSXfwvpE" + "&sensor=false&callback=initialize";
+    document.body.appendChild(script);
+
     console.log('hi');
     var xhr = new XMLHttpRequest();
     xhr.addEventListener( "load", onLoadResponse );
+
     xhr.open( "get", "load?", true );
     xhr.send();
 
 }
 
+//initialize google maps
+function initialize() {
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 11,
+    center: {lat: 39.738798, lng: -104.967203}
+  });
+
+/*  var ctaLayer = new google.maps.KmlLayer({
+    url: 'https://www.dropbox.com/s/ca9jlq7hbxg3x4n/neighborhoods.kml';,
+    map: map
+  });*/
+}
+
+
 //do all the things
 function onLoadResponse(evt){
 //  console.log("HEREEE");
+
+
+
   var dropDown1= document.getElementById("puma_select");
   var dropDown2= document.getElementById("year_select");
   var dropDown3= document.getElementById("category_select");

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<NetworkLink>
+	<name>Zillow Neighborhoods</name>
+	<visibility>0</visibility>
+	<Snippet maxLines="0"></Snippet>
+	<description><![CDATA[<a href="http://www.gelib.com/zillow-neighborhoods.htm">More Information</a><br><br>]]></description>
+	<flyToView>1</flyToView>
+	<Link>
+		<href>http://www.gelib.com/maps/zillow-neighborhoods/zillow-neighborhoods.kml</href>
+		<viewRefreshMode>onRequest</viewRefreshMode>
+	</Link>
+</NetworkLink>
+</kml>

@@ -22,12 +22,25 @@ function getFormValuesFromURL( url )
     return kvs
 }
 
+function initMap() {
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 11,
+    center: {lat: 41.876, lng: -87.624}
+  });
+
+  var ctaLayer = new google.maps.KmlLayer({
+    url: 'http://googlemaps.github.io/js-v2-samples/ggeoxml/cta.kml',
+    map: map
+  });
+}
+
 //my code compile repo ben
 //serveStatic library node will do all this
 
 
 function serveDynamic( req, res )
 {
+  //  initMap();
   //  var kvs = getFormValuesFromURL( req.url );
     console.log(req.url);
     if( req.url.indexOf( "getData?" ) >= 0 )
@@ -47,6 +60,15 @@ function serveDynamic( req, res )
         var temp = "SERIALNO";
         //db.all( "SELECT ? FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[category, parseInt(puma), parseInt(year)],
 
+
+      //doesn't work right now, need to get the PUMA when we select neighborhood
+        /*db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ?", [ puma ],
+          function( err, rows ) {
+            console.log(rows[0].PUMA);
+          });
+        console.log("HI" +puma);
+      */
+
         //problems : sqlite select statement is not safe
         db.all( "SELECT "+category+" FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[ puma, year],
               function( err, rows ) {
@@ -60,27 +82,23 @@ function serveDynamic( req, res )
                 } );
 
     }
-    else if( req.url.indexOf( "idk?" ) >= 0 )
-    {
-        //do shyt
-        var data="hi"
-        res.writeHead( 200 );
-        res.end( ""+data );
-    }
 
     else if( req.url.indexOf( "load?" ) >= 0 )
     {
+
       var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
       var pumas =[]
-      db.all( "SELECT PUMA FROM House_Data2",
+      db.all( "SELECT NEIGHBORHOOD FROM NEIGHBORHOODS",
             function( err, rows ) {
                 if(err){ console.log(err);}
                 for( var i = 0; i < rows.length; i++ )
                 {
-                  if(pumas.indexOf(parseInt(rows[i].PUMA))==-1){
+                  console.log(rows[i].Neighborhood);
+                  pumas.push(rows[i].Neighborhood);
+                /*  if(pumas.indexOf(parseInt(rows[i].PUMA))==-1){
                       pumas.push(parseInt(rows[i].PUMA))
                     //  console.log(parseInt(rows[i].PUMA))
-                  }
+                  }*/
                 }
               var jsonData ={}
               jsonData.puma_list=pumas;
