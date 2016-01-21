@@ -3,15 +3,25 @@
 var oneYear = true;
 function onPageLoad()
 {
+
+/*    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = src="https://www.google.com/jsapi";//?autoload={'modules':['name':'visualization','version':'1','packages':['corechart']]}&callback=drawChart";
+    document.body.appendChild(script);
+
+  /*  var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = src="https://www.gstatic.com/charts/loader.js";
+    document.body.appendChild(script);
+*/
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = "https://maps.googleapis.com/maps/api/js?key=" + "AIzaSyDSZEk1qVzdKWLeQqFQBcpIl_ezSXfwvpE" + "&callback=initialize";
     document.body.appendChild(script);
 
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = "https://www.google.com/jsapi";
-    document.body.appendChild(script);
+
+    //google.load('visualization', '1.0', {'packages':['corechart']});
+    //google.setOnLoadCallback(drawChart);
 
     console.log('hi');
     var xhr = new XMLHttpRequest();
@@ -200,8 +210,8 @@ function FS(info){
 
 //TODO
 //Where do I put these?
-//  google.load('visualization', '1.0', {'packages':['corechart']});
-//  google.setOnLoadCallback(drawChart);
+// google.load('visualization', '1.0', {'packages':['corechart']});
+// google.setOnLoadCallback(drawChart);
 
 }
 
