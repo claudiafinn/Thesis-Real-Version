@@ -8,6 +8,11 @@ function onPageLoad()
     script.src = "https://maps.googleapis.com/maps/api/js?key=" + "AIzaSyDSZEk1qVzdKWLeQqFQBcpIl_ezSXfwvpE" + "&callback=initialize";
     document.body.appendChild(script);
 
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = "https://www.google.com/jsapi";
+    document.body.appendChild(script);
+
     console.log('hi');
     var xhr = new XMLHttpRequest();
     xhr.addEventListener( "load", onLoadResponse );
@@ -26,16 +31,13 @@ function initialize() {
       center: new google.maps.LatLng(39.737760, -105.000755),
       //mapTypeId: google.maps.MapTypeId.ROADMAP
   });
-
 //kml version
   var ctaLayer = new google.maps.KmlLayer({
       url: "https://www.dropbox.com/s/ca9jlq7hbxg3x4n/neighborhoods.kml?dl=1",
       map: map
     });
-
 //geoJson version
 //  map.data.loadGeoJson('https://www.dropbox.com/s/civ8ghtyu4glxgt/neighborhoods.json?dl=1');
-
   //credit Tushar Gupta
   var strictBounds = new google.maps.LatLngBounds(
     new google.maps.LatLng(28.70, -54.50),
@@ -93,8 +95,6 @@ function initialize() {
 //do all the things
 function onLoadResponse(evt){
 //  console.log("HEREEE");
-
-
 
   var dropDown1= document.getElementById("puma_select");
   var dropDown2= document.getElementById("year_select");
@@ -154,8 +154,8 @@ function getResultsOne(){
 }
 
 //get results for a range of years
+//TODO
 function getResultsTwo(){
-
 }
 //inside this function I'll call a bunch more functions to do cool shit
 function onResponse( evt )
@@ -165,25 +165,69 @@ function onResponse( evt )
     var info = xhr.responseText.split(',');
 
     //make these statements for each potential category
+    //TODO
     if (info[0]=="FS"){
       console.log("Woo");
       FS(info);
-      //call function to analyze FS
     }
+
 
 }
 
 function FS(info){
-  var table = document.getElementById( 'table' );
 
+  var text = document.getElementById( 'testText' );
+  var totalYes=0;
+  var totalNo=0;
+  var totalVacant=0;
   for (var i =0; i<info.length; i++){
-    var item =document.createElement('td');
+    if (info[i] ==2){
+      totalNo++;
+    }
+    else if(info[i] ==1){
+      totalYes++;
+    }
+    else{
+      totalVacant++;
+    }
+    /*var item =document.createElement('td');
     var row = document.createElement('tr');
     table.appendChild(row);
     row.appendChild(item);
-    item.innerHTML = info[i];
+    item.innerHTML = info[i];*/
   }
+  text.innerHTML = "No :"+totalNo+" Yes: "+totalYes+" Vacant: "+totalVacant;
+
+//TODO
+//Where do I put these?
+//  google.load('visualization', '1.0', {'packages':['corechart']});
+//  google.setOnLoadCallback(drawChart);
+
 }
+
+function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Topping');
+        data.addColumn('number', 'Slices');
+        data.addRows([
+          ['Mushrooms', 3],
+          ['Onions', 1],
+          ['Olives', 1],
+          ['Zucchini', 1],
+          ['Pepperoni', 2]
+        ]);
+
+        // Set chart options
+        var options = {'title':'How Much Pizza I Ate Last Night',
+                       'width':400,
+                       'height':300};
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
 //don't think this is doing anything
 function sendUpdateReq()
 {
