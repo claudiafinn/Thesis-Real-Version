@@ -22,17 +22,18 @@ function getFormValuesFromURL( url )
     return kvs
 }
 
-function initMap() {
+/*function initMap() {
   var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 11,
-    center: {lat: 41.876, lng: -87.624}
+    //39.742141, -105.022376
+    center: {lat: 39.742141, lng: -105.022376}
   });
 
   var ctaLayer = new google.maps.KmlLayer({
     url: 'http://googlemaps.github.io/js-v2-samples/ggeoxml/cta.kml',
     map: map
   });
-}
+}*/
 
 //my code compile repo ben
 //serveStatic library node will do all this
@@ -45,6 +46,7 @@ function serveDynamic( req, res )
     console.log(req.url);
     if( req.url.indexOf( "getData?" ) >= 0 )
     {
+        //TODO
         //library that does this for me - node qs
         //url encoding/decoding
         //var qs = require ('query-string'
@@ -60,25 +62,24 @@ function serveDynamic( req, res )
         var temp = "SERIALNO";
         //db.all( "SELECT ? FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[category, parseInt(puma), parseInt(year)],
 
-
-      //doesn't work right now, need to get the PUMA when we select neighborhood
-        /*db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ?", [ puma ],
+        db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ?", [ puma ],
           function( err, rows ) {
             console.log(rows[0].PUMA);
+            puma=rows[0].PUMA;
           });
-        console.log("HI" +puma);
-      */
 
         //problems : sqlite select statement is not safe
-        db.all( "SELECT "+category+" FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[ puma, year],
+        db.all( "SELECT FS FROM House_Data2 WHERE PUMA = 813 AND YEAR = 2008",
+        //db.all( "SELECT "+category+" FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[puma, year],
               function( err, rows ) {
                   if(err){ console.log(err);}
+                  console.log(category, year,puma);
                   for( var i = 0; i < rows.length; i++ )
                   {
                     data=data+(rows[i][category])+",";
                   }
                   res.writeHead( 200 );
-                  res.end( ""+data );
+                  res.end( "FS, "+data );
                 } );
 
     }
