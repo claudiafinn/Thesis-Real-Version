@@ -35,7 +35,7 @@ function getFormValuesFromURL( url )
   });
 }*/
 
-//my code compile repo ben
+//my code compile repo ben /source/dmcc_server.js
 //serveStatic library node will do all this
 
 
@@ -66,22 +66,19 @@ function serveDynamic( req, res )
           function( err, rows ) {
             console.log(rows[0].PUMA);
             puma=rows[0].PUMA;
-          });
 
-        //problems : sqlite select statement is not safe
-        db.all( "SELECT FS FROM House_Data2 WHERE PUMA = 813 AND YEAR = 2008",
-        //db.all( "SELECT "+category+" FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[puma, year],
-              function( err, rows ) {
+              console.log("hello",puma, year);
+              db.all( "SELECT * FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[puma, year],
+                function( err, rows ) {
                   if(err){ console.log(err);}
-                  console.log(category, year,puma);
                   for( var i = 0; i < rows.length; i++ )
                   {
                     data=data+(rows[i][category])+",";
                   }
                   res.writeHead( 200 );
-                  res.end( "FS, "+data );
+                  res.end( category+","+data );
                 } );
-
+        });
     }
 
     else if( req.url.indexOf( "load?" ) >= 0 )

@@ -121,6 +121,9 @@ function onLoadResponse(evt){
   dropDown2.options.add( new Option("2014") );
   dropDown2.options.add( new Option("2015") );
 
+
+  dropDown3.options.add( new Option("Rent", "RNTP") );
+  dropDown3.options.add( new Option("Household Language","HHL") );
   dropDown3.options.add( new Option("Food Stamp", "FS") );
   dropDown3.options.add( new Option("Year Moved in","MV") );
   dropDown3.options.add( new Option("Vacancy Status", "VACS") );
@@ -167,6 +170,9 @@ function getResultsOne(){
 //TODO
 function getResultsTwo(){
 }
+
+
+
 //inside this function I'll call a bunch more functions to do cool shit
 function onResponse( evt )
 {
@@ -180,12 +186,33 @@ function onResponse( evt )
       console.log("Woo");
       FS(info);
     }
-
-
+    if (info[0]=="RNTP"){
+      console.log("Woo");
+      RNTP(info);
+    }
+    if (info[0]=="HHL"){
+      console.log("Woo");
+      HHL(info);
+    }
+    if (info[0]=="VACS"){
+      console.log("Woo");
+      VACS(info);
+    }
 }
-
+function VACS(info){
+    var text = document.getElementById( 'testText' );
+    text.innerHTML="Vacancy stuff";
+    drawChart();
+}
+function HHL(info){
+    var text = document.getElementById( 'testText' );
+    text.innerHTML="Language stuff";
+}
+function RNTP(info){
+    var text = document.getElementById( 'testText' );
+    text.innerHTML="Rent stuff";
+}
 function FS(info){
-
   var text = document.getElementById( 'testText' );
   var totalYes=0;
   var totalNo=0;
@@ -200,44 +227,32 @@ function FS(info){
     else{
       totalVacant++;
     }
-    /*var item =document.createElement('td');
-    var row = document.createElement('tr');
-    table.appendChild(row);
-    row.appendChild(item);
-    item.innerHTML = info[i];*/
   }
   text.innerHTML = "No :"+totalNo+" Yes: "+totalYes+" Vacant: "+totalVacant;
-
-//TODO
-//Where do I put these?
-// google.load('visualization', '1.0', {'packages':['corechart']});
-// google.setOnLoadCallback(drawChart);
-
+  drawFSChart(totalNo, totalYes, totalVacant);
 }
 
-function drawChart() {
-
+function drawFSChart(no, yes, vac) {
         // Create the data table.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
-        data.addRows([
-          ['Mushrooms', 3],
-          ['Onions', 1],
-          ['Olives', 1],
-          ['Zucchini', 1],
-          ['Pepperoni', 2]
-        ]);
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topping');
+    data.addColumn('number', 'Slices');
+    data.addRows([
+      ['Yes', yes],
+      ['No', no],
+      ['Vacant Household', vac],
 
-        // Set chart options
-        var options = {'title':'How Much Pizza I Ate Last Night',
-                       'width':400,
-                       'height':300};
+    ]);
 
-        // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-      }
+    // Set chart options
+    var options = {'title':'Percentage of Households using Food Stamps',
+                   'width':400,
+                   'height':300};
+
+    // Instantiate and draw our chart, passing in some options.
+    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+  }
 //don't think this is doing anything
 function sendUpdateReq()
 {
