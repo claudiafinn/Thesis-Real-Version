@@ -2,6 +2,7 @@ var fs   = require( 'fs' );
 var http = require( 'http' );
 var sql = require( 'sqlite3' ).verbose();
 var serveStatic = require('serve-static');
+var qs = require( 'querystring' );
 //var the_num = 0;
 
 //async library
@@ -44,20 +45,14 @@ function serveDynamic( req, res )
   //  initMap();
   //  var kvs = getFormValuesFromURL( req.url );
     console.log(req.url);
+    var qs_params = qs.parse( req.url.split( "?" )[ 1 ] );
+    console.log(qs_params);
     if( req.url.indexOf( "getData?" ) >= 0 )
     {
-        //TODO
-        //library that does this for me - node qs
-        //url encoding/decoding
-        //var qs = require ('query-string'
-       //code compile ben)
-        var url_parts = req.url.split('?');
-        var more_parts=url_parts[1].split('&');
-        var puma = more_parts[0].split('=')[1];
-        var year = more_parts[1].split('=')[1];
-        var category = more_parts[2].split('=')[1];
+        var puma = qs_params.puma
+        var year = qs_params.year
+        var category = qs_params.category
         var data=""
-        console.log(puma, year, category);
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
         var temp = "SERIALNO";
         //db.all( "SELECT ? FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[category, parseInt(puma), parseInt(year)],

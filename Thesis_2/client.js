@@ -169,6 +169,19 @@ function getResultsOne(){
 //get results for a range of years
 //TODO
 function getResultsTwo(){
+  var drop1 = document.getElementById('puma_select');
+  var drop2 = document.getElementById('year_select');
+  var drop3 = document.getElementById('category_select');
+//get value not text
+  var drop1select = drop1.options[drop1.selectedIndex].text;
+  var drop2select = drop2.options[drop2.selectedIndex].text;
+  var drop3select = drop3.options[drop3.selectedIndex].value;
+  console.log(drop1select, drop2select, drop3select);
+  var xhr = new XMLHttpRequest();
+  xhr.addEventListener( "load", onResponse );
+  xhr.open( "get", "getData?puma="+drop1select+"&year="+drop2select+"&category="+drop3select, true );
+
+  xhr.send();
 }
 
 
