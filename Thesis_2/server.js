@@ -58,17 +58,23 @@ function serveDynamic( req, res )
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ?", [ puma ],
             function( err, rows ) {
               puma=rows[0].PUMA;
+              //single everything
               if(typeof year2 == "undefined" ){
                 console.log("single everything");
                 db.all( "SELECT * FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[puma, year],
                   function( err, rows ) {
                     if(err){ console.log(err);}
+                    var jsonData=[];
                     for( var i = 0; i < rows.length; i++ )
                     {
-                      data=data+(rows[i][category])+",";
+                      jsonData.push(rows[i][category])
                     }
+
+                    var json = {};
+                    json.dataList=jsonData;
+                    json.dataType=category;
                     res.writeHead( 200 );
-                    res.end( category+","+data );
+                    res.end(JSON.stringify(json));
                   }
                 );
               }
@@ -98,19 +104,21 @@ function serveDynamic( req, res )
                     var json = {};
                     json.dataList=jsonData;
                     json.dataType=category;
+                    json.multipleYears=true;
                     res.writeHead( 200 );
-                    res.end(JSON.stringify(json));//",double,"+data );
+                    res.end(JSON.stringify(json));
                   }
                 );
               }
             }
           );
         }
-
+        //TODO
         else if(typeof category2 !="undefined"){
             //dif
             console.log("double cat");
         }
+        //TODO
         else if(typeof puma2 !="undefined"){
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ? OR Neighborhood = ?", [ puma, puma2 ],
             function( err, rows ) {

@@ -180,31 +180,23 @@ function onResponse( evt )
   var jsonData=JSON.parse(evt.target.responseText);
   console.log("length"+jsonData.dataList.length);
 
-
   if (jsonData.dataType=="HHL"){
     console.log('here');
     HHL(jsonData);
-  }
-  /*var xhr = evt.target;
-  console.log( "Response text: ", xhr.responseText );
-  var info = xhr.responseText.split(',');*/
 
-/*  if (info[0]=="FS"){
-    console.log("Woo");
-    FS(info);
   }
-  if (info[0]=="RNTP"){
-    console.log("Woo");
-    RNTP(info);
+  if (jsonData.dataType=="FS"){
+    console.log('here');
+    FS(jsonData);
   }
-  if (info[0]=="HHL"){
-    console.log("Woo" + info[1]);
-    HHL(info);
+  if (jsonData.dataType=="RNTP"){
+    console.log('here');
+    RNTP(jsonData);
   }
-  if (info[0]=="VACS"){
-    console.log("Woo");
-    VACS(info);
-  }*/
+  if (jsonData.dataType=="VACS"){
+    console.log('here');
+    VACS(jsonData);
+  }
 }
 
 function VACS(info){
@@ -213,35 +205,33 @@ function VACS(info){
   drawChart();
 }
 
-function HHL(jsonData){
-
-  for (var i=0; i<jsonData.dataList.length; i++){
-    //dropDown1.options.add( new Option(jsonData.puma_list[i]) );
-    console.log("here"+(jsonData.dataList[i])['year']);
-  }
-  /*  var english =0;
+function HHL(info){
+  if(info.multipleYears==false){
+    var english =0;
     var spanish=0;
     var indeu=0;
     var asian=0;
     var other=0;
-    for (var i =0; i<info.length; i++){
-      if (info[i] ==1){
+    for (var i=0; i<info.dataList.length; i++){
+      if (info.dataList[i] ==1){
         english++;
       }
-      if (info[i] ==2){
+      if (info.dataList[i] ==2){
         spanish++;
       }
-      if (info[i] ==3){
+      if (info.dataList[i] ==3){
         indeu++;
       }
-      if (info[i] ==4){
+      if (info.dataList[i] ==4){
         asian++;
       }
-      if (info[i] ==5){
+      if (info.dataList[i] ==5){
         other++;
       }
     }
-    drawHHLChart(english,spanish,indeu,asian,other);*/
+    drawHHLChart(english,spanish,indeu,asian,other);
+  }
+
 }
 function RNTP(info){
     var text = document.getElementById( 'testText' );
@@ -252,17 +242,19 @@ function FS(info){
   var totalYes=0;
   var totalNo=0;
   var totalVacant=0;
-  for (var i =0; i<info.length; i++){
-    if (info[i] ==2){
+  for (var i=0; i<info.dataList.length; i++){
+    if (info.dataList[i]==2){
       totalNo++;
     }
-    else if(info[i] ==1){
+    else if(info.dataList[i]==1){
       totalYes++;
     }
     else{
       totalVacant++;
+
     }
   }
+
   text.innerHTML = "No :"+totalNo+" Yes: "+totalYes+" Vacant: "+totalVacant;
   drawFSChart(totalNo, totalYes, totalVacant);
 }
