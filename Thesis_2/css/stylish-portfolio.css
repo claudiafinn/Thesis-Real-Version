@@ -151,7 +151,7 @@ hr.small {
 /* Header */
 
 .header {
-    background-image: url(../img/bg.jpg);
+    background-image: url(../img/denver4.jpg);
     display: table;
     position: relative;
     width: 100%;
@@ -174,7 +174,7 @@ hr.small {
 
 .services {
     padding: 50px 0;
-    
+
 }
 
 .service-item {
