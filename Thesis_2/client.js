@@ -1,5 +1,9 @@
 
 var oneYear = true;
+var years =["2007", "2008", "2009", "2010", "2011", "2012", "2013"];
+var categories = [{"Value": "FS", "Display":"Food Stamp"}, {"Value": "VACS", "Display":"Vacancy Status"},
+              {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"}];
+var neighborhoods=[];
 
 function onPageLoad()
 {
@@ -92,26 +96,18 @@ function onLoadResponse(evt){
   var dropDown1= document.getElementById("puma_select");
   var dropDown2= document.getElementById("year_select");
   var dropDown3= document.getElementById("category_select");
+  for(var i=0; i<years.length; i++){
+    dropDown2.options.add( new Option(years[i]) );
+  }
 
-  dropDown2.options.add( new Option("2008") );
-  dropDown2.options.add( new Option("2009") );
-  dropDown2.options.add( new Option("2010") );
-  dropDown2.options.add( new Option("2011") );
-  dropDown2.options.add( new Option("2012") );
-  dropDown2.options.add( new Option("2013") );
-  dropDown2.options.add( new Option("2014") );
-  dropDown2.options.add( new Option("2015") );
-
-  dropDown3.options.add( new Option("Rent", "RNTP") );
-  dropDown3.options.add( new Option("Household Language","HHL") );
-  dropDown3.options.add( new Option("Food Stamp", "FS") );
-  dropDown3.options.add( new Option("Year Moved in","MV") );
-  dropDown3.options.add( new Option("Vacancy Status", "VACS") );
-  dropDown3.options.add( new Option("Serial No", "SERIALNO") );
+  for(var i=0; i<categories.length; i++){
+    dropDown3.options.add( new Option(categories[i].Display, categories[i].Value) );
+  }
 
   var xhr = evt.target;
   var jsonData=JSON.parse(xhr.responseText);
-  console.log(jsonData.puma_list.length);
+  //console.log(jsonData.puma_list.length);
+  neighborhoods=jsonData.puma_list;
   for (var i=0; i<jsonData.puma_list.length; i++){
     dropDown1.options.add( new Option(jsonData.puma_list[i]) );
   }
@@ -176,7 +172,6 @@ function getResultsTwo(){
 //inside this function I'll call a bunch more functions to do cool shit
 function onResponse( evt )
 {
-
   var jsonData=JSON.parse(evt.target.responseText);
   console.log("length"+jsonData.dataList.length);
 
@@ -318,27 +313,24 @@ function addCategory(){
   var new_select=document.createElement('select');
   new_select.className="form-control";
   new_select.id="category_select2";
-
-  new_select.options.add( new Option("Rent", "RNTP") );
-  new_select.options.add( new Option("Household Language","HHL") );
-  new_select.options.add( new Option("Food Stamp", "FS") );
-  new_select.options.add( new Option("Year Moved in","MV") );
-  new_select.options.add( new Option("Vacancy Status", "VACS") );
-  new_select.options.add( new Option("Serial No", "SERIALNO") );
-
+  for(var i=0; i<categories.length; i++){
+    new_select.options.add( new Option(categories[i].Display, categories[i].Value) );
+  }
   div.appendChild(new_select);
   div.removeChild(button);
-
-  //oneYear=false;
-
 }
 
 function addNeighborhood(){
   var div = document.getElementById( 'puma_container' );
-  var button = document.getElementById( 'add_year' );
+  var button = document.getElementById( 'add_puma' );
   var new_select=document.createElement('select');
   new_select.className="form-control";
   new_select.id="puma_select2";
+  for(var i=0; i<neighborhoods.length; i++){
+    new_select.options.add( new Option(neighborhoods[i]) );
+  }
+  div.appendChild(new_select);
+  div.removeChild(button);
 }
 function addYear(){
   var div = document.getElementById( 'year_container' );
@@ -346,14 +338,9 @@ function addYear(){
   var new_select=document.createElement('select');
   new_select.className="form-control";
   new_select.id="year_select2";
-  new_select.options.add( new Option("2008") );
-  new_select.options.add( new Option("2009") );
-  new_select.options.add( new Option("2010") );
-  new_select.options.add( new Option("2011") );
-  new_select.options.add( new Option("2012") );
-  new_select.options.add( new Option("2013") );
-  new_select.options.add( new Option("2014") );
-  new_select.options.add( new Option("2015") );
+  for(var i=0; i<years.length; i++){
+    new_select.options.add( new Option(years[i]) );
+  }
   div.appendChild(new_select);
   div.removeChild(button);
   oneYear=false;

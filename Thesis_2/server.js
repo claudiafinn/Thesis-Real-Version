@@ -4,34 +4,6 @@ var sql = require( 'sqlite3' ).verbose();
 var serveStatic = require('serve-static');
 var qs = require( 'querystring' );
 
-/*function getFormValuesFromURL( url )
-{
-    var kvs = {};
-    var parts = url.split( "?" );
-    if( parts.length === 2 )
-    {
-        var key_value_pairs = parts[1].split( "&" );
-        for( var i = 0; i < key_value_pairs.length; i++ )
-        {
-            var key_value = key_value_pairs[i].split( "=" );
-            kvs[ key_value[0] ] = key_value[1];
-        }
-    }
-    return kvs
-}
-
-/*function initMap() {
-  var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 11,
-    //39.742141, -105.022376
-    center: {lat: 39.742141, lng: -105.022376}
-  });
-
-  var ctaLayer = new google.maps.KmlLayer({
-    url: 'http://googlemaps.github.io/js-v2-samples/ggeoxml/cta.kml',
-    map: map
-  });
-}*/
 
 //my code compile repo ben /source/dmcc_server.js
 //serveStatic library node will do all this
@@ -97,8 +69,9 @@ function serveDynamic( req, res )
                     var jsonData =[]
                     for( var i = 0; i < rows.length; i++ )
                     {
+                      //build js object
                       var x ={"year": rows[i]['YEAR'], "value":rows[i][category]}
-                      data=data+(rows[i]['YEAR']+","+rows[i][category])+",";
+                      //add it to the list
                       jsonData.push(x);
                     }
                     var json = {};
@@ -118,7 +91,7 @@ function serveDynamic( req, res )
             //dif
             console.log("double cat");
         }
-        //TODO
+        //multiple nieghborhoods
         else if(typeof puma2 !="undefined"){
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ? OR Neighborhood = ?", [ puma, puma2 ],
             function( err, rows ) {
@@ -126,15 +99,21 @@ function serveDynamic( req, res )
               puma2=rows[1].PUMA;
               console.log(puma, puma2)
               console.log("double puma");
-              db.all( "SELECT * FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[puma, year],
+              db.all( "SELECT * FROM House_Data2 WHERE (PUMA = ? OR PUMA = ?) AND YEAR = ?",[puma, puma2, year],
                 function( err, rows ) {
                   if(err){ console.log(err);}
+                  var jsonData =[]
                   for( var i = 0; i < rows.length; i++ )
                   {
-                    data=data+(rows[i][category])+",";
+                    var x ={"puma": rows[i]['PUMA'], "value":rows[i][category]}
+                    jsonData.push(x);
                   }
+                  var json = {};
+                  json.dataList=jsonData;
+                  json.dataType=category;
+                  json.multipleYears=true;
                   res.writeHead( 200 );
-                  res.end( category+","+data );
+                  res.end(JSON.stringify(json));
                 }
               );
           }
@@ -154,10 +133,6 @@ function serveDynamic( req, res )
                 {
                   console.log(rows[i].Neighborhood);
                   pumas.push(rows[i].Neighborhood);
-                /*  if(pumas.indexOf(parseInt(rows[i].PUMA))==-1){
-                      pumas.push(parseInt(rows[i].PUMA))
-                    //  console.log(parseInt(rows[i].PUMA))
-                  }*/
                 }
               var jsonData ={}
               jsonData.puma_list=pumas;
