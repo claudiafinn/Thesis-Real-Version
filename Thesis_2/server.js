@@ -27,6 +27,7 @@ function serveDynamic( req, res )
 
         //no doubles or double year
         if(typeof category2 == "undefined" && typeof puma2 == "undefined"){
+          //get corresponding PUMA from NEIGHBORHOOD
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ?", [ puma ],
             function( err, rows ) {
               puma=rows[0].PUMA;
@@ -36,14 +37,20 @@ function serveDynamic( req, res )
                 db.all( "SELECT * FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[puma, year],
                   function( err, rows ) {
                     if(err){ console.log(err);}
-                    var jsonData=[];
+                    var dataToSend={};
                     for( var i = 0; i < rows.length; i++ )
                     {
-                      jsonData.push(rows[i][category])
+                      if(!(rows[i]['YEAR'] in dataToSend))
+                      {
+                        dataToSend[rows[i]['YEAR']] = [ rows[i][category] ];
+                      }
+                      else {
+                        dataToSend[rows[i]['YEAR']].push(rows[i][category]);
+                      }
                     }
-
                     var json = {};
-                    json.dataList=jsonData;
+                    json.year = year;
+                    json.dataList=dataToSend;
                     json.dataType=category;
                     res.writeHead( 200 );
                     res.end(JSON.stringify(json));
@@ -62,22 +69,19 @@ function serveDynamic( req, res )
                 }
                 sqlString+=")";
 
-                //console.log(sqlString);
                 db.all(sqlString,[puma],
                   function( err, rows ) {
                     if(err){ console.log(err);}
-                    var jsonData =[]
+                    var dataToSend={};
                     for( var i = 0; i < rows.length; i++ )
                     {
-                      //build js object
-                      var x ={"year": rows[i]['YEAR'], "value":rows[i][category]}
-                      //add it to the list
-                      jsonData.push(x);
+                      if( !(rows[i]['YEAR'] in dataToSend)){dataToSend[rows[i]['YEAR']] = [ rows[i][category] ];}
+                      else { dataToSend[rows[i]['YEAR']].push(rows[i][category]); }
                     }
                     var json = {};
-                    json.dataList=jsonData;
+                    json.year = year;
+                    json.dataList=dataToSend;
                     json.dataType=category;
-                    json.multipleYears=true;
                     res.writeHead( 200 );
                     res.end(JSON.stringify(json));
                   }
@@ -131,7 +135,6 @@ function serveDynamic( req, res )
                 if(err){ console.log(err);}
                 for( var i = 0; i < rows.length; i++ )
                 {
-                  console.log(rows[i].Neighborhood);
                   pumas.push(rows[i].Neighborhood);
                 }
               var jsonData ={}

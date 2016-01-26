@@ -22,20 +22,20 @@ function onPageLoad()
 
 function initialize() {
 
-  var minZoomLevel = 12;
+  var minZoomLevel = 11;
   var map = new google.maps.Map(document.getElementById('map'), {
       zoom: minZoomLevel,
-      center: new google.maps.LatLng(39.737760, -105.000755),
+      center:{lat: 39.737760, lng: -105.000755}
   });
 
-//kml version
-  var ctaLayer = new google.maps.KmlLayer({
-      url: "https://www.dropbox.com/s/ca9jlq7hbxg3x4n/neighborhoods.kml?dl=1",
-      map: map
-    });
+  //kml version
+  /*  var ctaLayer = new google.maps.KmlLayer({
+        url: "https://www.dropbox.com/s/ca9jlq7hbxg3x4n/neighborhoods.kml?dl=1",
+        map: map
+      });*/
 
-//geoJson version
-//  map.data.loadGeoJson('https://www.dropbox.com/s/civ8ghtyu4glxgt/neighborhoods.json?dl=1');
+  //geoJson version
+  map.data.loadGeoJson('https://www.dropbox.com/s/civ8ghtyu4glxgt/neighborhoods.json?dl=1');
 
   //credit Tushar Gupta
   var strictBounds = new google.maps.LatLngBounds(
@@ -70,24 +70,23 @@ function initialize() {
       if (map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
   });
 
-//styling with GoeJSON - doesn't work
 /*  map.data.setStyle(function(feature) {
     var color = 'purple';
     if (feature.getProperty('isColorful')) {
       color = feature.getProperty('color');
     }
-    return //** @type {google.maps.Data.StyleOptions} */
-  /*  ({
+    return
+    ({
       fillColor: color,
       strokeColor: color,
       strokeWeight: 2
     });
-  });
+  });*/
 
-  KmlLayer.addListener('mouseover', function(event) {
-      map.data.revertStyle();
-      map.data.overrideStyle(event.feature, {strokeWeight: 8});
-    });*/
+  map.data.addListener('mouseover', function(event) {
+    map.data.revertStyle();
+    map.data.overrideStyle(event.feature, {strokeWeight: 8});
+  });
 }
 
 
@@ -106,7 +105,6 @@ function onLoadResponse(evt){
 
   var xhr = evt.target;
   var jsonData=JSON.parse(xhr.responseText);
-  //console.log(jsonData.puma_list.length);
   neighborhoods=jsonData.puma_list;
   for (var i=0; i<jsonData.puma_list.length; i++){
     dropDown1.options.add( new Option(jsonData.puma_list[i]) );
@@ -137,6 +135,7 @@ function getResultsOne(){
   console.log(drop1select, drop2select, drop3select);
   var xhr = new XMLHttpRequest();
   xhr.addEventListener( "load", onResponse );
+  //TODO
   xhr.open( "get", "getData?puma="+drop1select+"&year="+drop2select+"&category="+drop3select, true );
 
   xhr.send();
@@ -169,27 +168,21 @@ function getResultsTwo(){
   xhr.send();
 }
 
-//inside this function I'll call a bunch more functions to do cool shit
 function onResponse( evt )
 {
   var jsonData=JSON.parse(evt.target.responseText);
-  console.log("length"+jsonData.dataList.length);
+  //console.log("length"+jsonData.dataList.length);
 
   if (jsonData.dataType=="HHL"){
-    console.log('here');
     HHL(jsonData);
-
   }
   if (jsonData.dataType=="FS"){
-    console.log('here');
     FS(jsonData);
   }
   if (jsonData.dataType=="RNTP"){
-    console.log('here');
     RNTP(jsonData);
   }
   if (jsonData.dataType=="VACS"){
-    console.log('here');
     VACS(jsonData);
   }
 }
@@ -201,31 +194,35 @@ function VACS(info){
 }
 
 function HHL(info){
-  if(info.multipleYears==false){
+  console.log('here');
+  for(var year in info.dataList){
     var english =0;
     var spanish=0;
     var indeu=0;
     var asian=0;
     var other=0;
-    for (var i=0; i<info.dataList.length; i++){
-      if (info.dataList[i] ==1){
+    console.log(year);
+    for (var i=0; i<info.dataList[year].length; i++){
+      if (info.dataList[info.year][i] ==1){
         english++;
       }
-      if (info.dataList[i] ==2){
+      if (info.dataList[info.year][i] ==2){
         spanish++;
       }
-      if (info.dataList[i] ==3){
+      if (info.dataList[info.year][i] ==3){
         indeu++;
       }
-      if (info.dataList[i] ==4){
+      if (info.dataList[info.year][i] ==4){
         asian++;
       }
-      if (info.dataList[i] ==5){
+      if (info.dataList[info.year][i] ==5){
         other++;
       }
     }
     drawHHLChart(english,spanish,indeu,asian,other);
   }
+
+
 
 }
 function RNTP(info){
@@ -255,7 +252,8 @@ function FS(info){
 }
 
 function drawHHLChart(eng, span, indeu, asian, other) {
-        // Create the data table.
+    // Create the data table.
+    console.log('heee');
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Topping');
     data.addColumn('number', 'Slices');
@@ -268,9 +266,13 @@ function drawHHLChart(eng, span, indeu, asian, other) {
 
     ]);
     var options = {'title':'Distribution of Household Languages',
-                   'width':400,
-                   'height':300};
-    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+                   'width':350,
+                   'height':350};
+    var div = document.getElementById('chart_div');
+    var chartDiv = document.createElement('div');
+    chartDiv.setAttribute("style", "display: inline-block;")
+    div.appendChild(chartDiv);
+    var chart = new google.visualization.PieChart(chartDiv);
     chart.draw(data, options);
   }
 
