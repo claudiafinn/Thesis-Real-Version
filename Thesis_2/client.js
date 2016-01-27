@@ -120,7 +120,6 @@ function getResults()
     else{
       getResultsTwo()
     }
-
 }
 
 //get results for one year
@@ -172,7 +171,6 @@ function onResponse( evt )
 {
   var jsonData=JSON.parse(evt.target.responseText);
   //console.log("length"+jsonData.dataList.length);
-
   if (jsonData.dataType=="HHL"){
     HHL(jsonData);
   }
@@ -194,32 +192,30 @@ function VACS(info){
 }
 
 function HHL(info){
-  console.log('here');
   for(var year in info.dataList){
     var english =0;
     var spanish=0;
     var indeu=0;
     var asian=0;
     var other=0;
-    console.log(year);
     for (var i=0; i<info.dataList[year].length; i++){
-      if (info.dataList[info.year][i] ==1){
+      if (info.dataList[year][i] ==1){
         english++;
       }
-      if (info.dataList[info.year][i] ==2){
+      if (info.dataList[year][i] ==2){
         spanish++;
       }
-      if (info.dataList[info.year][i] ==3){
+      if (info.dataList[year][i] ==3){
         indeu++;
       }
-      if (info.dataList[info.year][i] ==4){
+      if (info.dataList[year][i] ==4){
         asian++;
       }
-      if (info.dataList[info.year][i] ==5){
+      if (info.dataList[year][i] ==5){
         other++;
       }
     }
-    drawHHLChart(english,spanish,indeu,asian,other);
+    drawHHLChart(english,spanish,indeu,asian,other, year);
   }
 
 
@@ -251,9 +247,9 @@ function FS(info){
   drawFSChart(totalNo, totalYes, totalVacant);
 }
 
-function drawHHLChart(eng, span, indeu, asian, other) {
+function drawHHLChart(eng, span, indeu, asian, other, year) {
     // Create the data table.
-    console.log('heee');
+    console.log('HHL CHART', eng, span, indeu, asian, other, year);
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Topping');
     data.addColumn('number', 'Slices');
@@ -265,7 +261,7 @@ function drawHHLChart(eng, span, indeu, asian, other) {
       ['Other', other],
 
     ]);
-    var options = {'title':'Distribution of Household Languages',
+    var options = {'title':year+': Distribution of Household Languages',
                    'width':350,
                    'height':350};
     var div = document.getElementById('chart_div');

@@ -31,64 +31,36 @@ function serveDynamic( req, res )
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ?", [ puma ],
             function( err, rows ) {
               puma=rows[0].PUMA;
-              //single everything
-              if(typeof year2 == "undefined" ){
-                console.log("single everything");
-                db.all( "SELECT * FROM House_Data2 WHERE PUMA = ? AND YEAR = ?",[puma, year],
-                  function( err, rows ) {
-                    if(err){ console.log(err);}
-                    var dataToSend={};
-                    for( var i = 0; i < rows.length; i++ )
-                    {
-                      if(!(rows[i]['YEAR'] in dataToSend))
-                      {
-                        dataToSend[rows[i]['YEAR']] = [ rows[i][category] ];
-                      }
-                      else {
-                        dataToSend[rows[i]['YEAR']].push(rows[i][category]);
-                      }
-                    }
-                    var json = {};
-                    json.year = year;
-                    json.dataList=dataToSend;
-                    json.dataType=category;
-                    res.writeHead( 200 );
-                    res.end(JSON.stringify(json));
-                  }
-                );
-              }
-              //double year
-              else{
-                console.log("double year");
                 //build sql string
-                var sqlString = "SELECT * FROM House_Data2 WHERE PUMA = ? AND (YEAR = "+year;
-                var dif = Math.abs(year-year2);
-                for(var i=0; i<dif; i++){
-                  year++;
-                  sqlString+=" OR YEAR = "+year
-                }
-                sqlString+=")";
-
-                db.all(sqlString,[puma],
-                  function( err, rows ) {
-                    if(err){ console.log(err);}
-                    var dataToSend={};
-                    for( var i = 0; i < rows.length; i++ )
-                    {
-                      if( !(rows[i]['YEAR'] in dataToSend)){dataToSend[rows[i]['YEAR']] = [ rows[i][category] ];}
-                      else { dataToSend[rows[i]['YEAR']].push(rows[i][category]); }
-                    }
-                    var json = {};
-                    json.year = year;
-                    json.dataList=dataToSend;
-                    json.dataType=category;
-                    res.writeHead( 200 );
-                    res.end(JSON.stringify(json));
-                  }
-                );
+              var sqlString = "SELECT * FROM House_Data2 WHERE PUMA = ? AND (YEAR = "+year;
+              if (typeof year2 == "undefined" ) { var dif = 0;}
+              else { var dif = Math.abs(year-year2); }
+              for(var i=0; i<dif; i++){
+                year++;
+                sqlString+=" OR YEAR = "+year
               }
-            }
-          );
+              sqlString+=")";
+              db.all(sqlString,[puma],
+                function( err, rows ) {
+                  if(err){ console.log(err);}
+                  var dataToSend={};
+                  for( var i = 0; i < rows.length; i++ )
+                  {
+                    if( !(rows[i]['YEAR'] in dataToSend))
+                    {
+                      dataToSend[rows[i]['YEAR']] = [ rows[i][category] ];
+                    }
+                    else {
+                      dataToSend[rows[i]['YEAR']].push(rows[i][category]);
+                    }
+                  }
+                  var json = {};
+                  json.dataList=dataToSend;
+                  json.dataType=category;
+                  res.writeHead( 200 );
+                  res.end(JSON.stringify(json));
+              });
+          });
         }
         //TODO
         else if(typeof category2 !="undefined"){
