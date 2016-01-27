@@ -19,21 +19,22 @@ function serveDynamic( req, res )
         var category = qs_params.category;
         //undefined if does not exist - but thats ok?
         var year2=qs_params.year2;
-        var category2=qs_params.category2;
+        var category2=qs_params.cat2;
         var puma2=qs_params.puma2;
         var data="";
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
         var query = "SELECT * FROM House_Data2 WHERE PUMA = ? AND YEAR = ?"
 
-        //no doubles or double year
-        if(typeof category2 == "undefined" && typeof puma2 == "undefined"){
+        //1 OR MULTIPLE YEAR QUERY
+        console.log(category2, puma2, year2);
+        if( (category2 == "") &&  (puma2 == "")){
           //get corresponding PUMA from NEIGHBORHOOD
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ?", [ puma ],
             function( err, rows ) {
               puma=rows[0].PUMA;
-                //build sql string
+              //build sql string
               var sqlString = "SELECT * FROM House_Data2 WHERE PUMA = ? AND (YEAR = "+year;
-              if (typeof year2 == "undefined" ) { var dif = 0;}
+              if (year2=="") { var dif = 0;}
               else { var dif = Math.abs(year-year2); }
               for(var i=0; i<dif; i++){
                 year++;
@@ -62,13 +63,15 @@ function serveDynamic( req, res )
               });
           });
         }
+
         //TODO
-        else if(typeof category2 !="undefined"){
+        else if(category2 !=""){
             //dif
             console.log("double cat");
         }
+
         //multiple nieghborhoods
-        else if(typeof puma2 !="undefined"){
+        else if( puma2 !=""){
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ? OR Neighborhood = ?", [ puma, puma2 ],
             function( err, rows ) {
               puma=rows[0].PUMA;

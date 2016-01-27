@@ -1,5 +1,5 @@
 
-var oneYear = true;
+//var oneYear = true;
 var years =["2007", "2008", "2009", "2010", "2011", "2012", "2013"];
 var categories = [{"Value": "FS", "Display":"Food Stamp"}, {"Value": "VACS", "Display":"Vacancy Status"},
               {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"}];
@@ -7,16 +7,15 @@ var neighborhoods=[];
 
 function onPageLoad()
 {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src = "https://maps.googleapis.com/maps/api/js?key=" + "AIzaSyDSZEk1qVzdKWLeQqFQBcpIl_ezSXfwvpE" + "&callback=initialize";
+  document.body.appendChild(script);
 
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = "https://maps.googleapis.com/maps/api/js?key=" + "AIzaSyDSZEk1qVzdKWLeQqFQBcpIl_ezSXfwvpE" + "&callback=initialize";
-    document.body.appendChild(script);
-
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener( "load", onLoadResponse );
-    xhr.open( "get", "load?", true );
-    xhr.send();
+  var xhr = new XMLHttpRequest();
+  xhr.addEventListener( "load", onLoadResponse );
+  xhr.open( "get", "load?", true );
+  xhr.send();
 
 }
 
@@ -111,66 +110,43 @@ function onLoadResponse(evt){
   }
 }
 
-function getResults()
-{
-    //split into different scenarios - there will be more
-    if(oneYear==true){
-      getResultsOne()
-    }
-    else{
-      getResultsTwo()
-    }
-}
 
-//get results for one year
-function getResultsOne(){
+function getResults(){
   var drop1 = document.getElementById('puma_select');
   var drop2 = document.getElementById('year_select');
   var drop3 = document.getElementById('category_select');
-//get value not text
   var drop1select = drop1.options[drop1.selectedIndex].text;
   var drop2select = drop2.options[drop2.selectedIndex].text;
   var drop3select = drop3.options[drop3.selectedIndex].value;
-  console.log(drop1select, drop2select, drop3select);
-  var xhr = new XMLHttpRequest();
-  xhr.addEventListener( "load", onResponse );
-  //TODO
-  xhr.open( "get", "getData?puma="+drop1select+"&year="+drop2select+"&category="+drop3select, true );
+  var drop4select ="";
+  var drop5select ="";
+  var drop6select ="";
 
-  xhr.send();
-}
-
-//get results for a range of years
-//TODO
-//need to update this for all potential doubles
-function getResultsTwo(){
-  var drop1 = document.getElementById('puma_select');
-  var drop2 = document.getElementById('year_select');
-  var drop3 = document.getElementById('category_select');
   var drop4 = document.getElementById('year_select2');
-//get value not text
-  var drop1select = drop1.options[drop1.selectedIndex].text;
-  var drop2select = drop2.options[drop2.selectedIndex].text;
-  var drop3select = drop3.options[drop3.selectedIndex].value;
-  var drop4select = drop4.options[drop4.selectedIndex].text;
-  console.log(drop1select, drop2select, drop3select, drop4select);
+  if (drop4 != null){ drop4select = drop4.options[drop4.selectedIndex].text; }
 
-  var params=[];
-  params["puma"]=drop1select;
-  params["year"]=drop2select;
-  params["category"]=drop3select;
-  params["year2"]=drop4select;
+  var drop5 = document.getElementById('category_select2');
+  if (drop5 != null){ drop5select = drop5.options[drop5.selectedIndex].text;}
+
+  var drop6 = document.getElementById('puma_select2');
+  if (drop6 != null){ drop6select = drop6.options[drop6.selectedIndex].text;}
+
   var xhr = new XMLHttpRequest();
   xhr.addEventListener( "load", onResponse );
-  xhr.open( "get", "getData?puma="+drop1select+"&year="+drop2select+"&category="+drop3select+"&year2="+drop4select, true );
+  xhr.open( "get", "getData?puma="+drop1select+"&year="+drop2select+"&category="+drop3select+"&year2="+drop4select+"&cat2="+drop5select+"&puma2="+drop6select, true );
 
   xhr.send();
 }
 
 function onResponse( evt )
 {
+  //removes previous charts
+  var chartDiv = document.getElementById('chart_div');
+  while (chartDiv.hasChildNodes()) {
+    chartDiv.removeChild(chartDiv.lastChild);
+  }
+
   var jsonData=JSON.parse(evt.target.responseText);
-  //console.log("length"+jsonData.dataList.length);
   if (jsonData.dataType=="HHL"){
     HHL(jsonData);
   }
@@ -341,7 +317,7 @@ function addYear(){
   }
   div.appendChild(new_select);
   div.removeChild(button);
-  oneYear=false;
+//  oneYear=false;
 
 
 }
