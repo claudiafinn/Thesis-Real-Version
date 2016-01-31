@@ -24,7 +24,7 @@ catch( exp ){
 //**Start real shit
 //
 //**
-var categories = ["YEAR","PUMA", "SERIALNO","ADJHSG", "ADJINC", "FS","RNTP","VACS","VALP","YBL","FINCP","HHL","HINCP","MV","TAXP","WORKSTAT"];//etc
+var categories = ["YEAR","PUMA", "SERIALNO","ADJHSG", "ADJINC", "NP", "FS","RNTP","VACS","VALP","YBL","FINCP","FPARC", "HHL","HHT", "HINCP","MV","MULTG","TAXP","WORKSTAT"];//etc
 var pumas = ["812","813"];//etc
 
 var contents = fileBuffer.toString();
@@ -46,8 +46,8 @@ console.log(data);
 
 
 //**create table
-//db.run("DROP TABLE House_Data2", function(err){});
-db.run("CREATE TABLE IF NOT EXISTS House_Data2 "+data,
+//db.run("DROP TABLE House_Data3", function(err){});
+db.run("CREATE TABLE IF NOT EXISTS House_Data3 "+data,
   function(err){
     console.log("1"+err)
       //res.writeHead( 200 );
@@ -95,7 +95,7 @@ for( var i = 0; i < contents_lines.length-1; i++ )
 
 input+=")";
 console.log(input);
-db.run("INSERT INTO House_Data2 VALUES "+input,
+db.run("INSERT INTO House_Data3 VALUES "+input,
       function(err){
         console.log("2"+err)
           //res.writeHead( 200 );

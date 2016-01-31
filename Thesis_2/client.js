@@ -2,7 +2,10 @@
 //var oneYear = true;
 var years =["2007", "2008", "2009", "2010", "2011", "2012", "2013"];
 var categories = [{"Value": "FS", "Display":"Food Stamp"}, {"Value": "VACS", "Display":"Vacancy Status"},
-              {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"}];
+              {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"},
+            {"Value": "MV", "Display":"Years Lived"},{"Value": "YBL", "Display":"Year Built"},
+          {"Value": "VALP", "Display":"Property Value"},{"Value": "TAXP", "Display":"Property Taxes"},
+        {"Value": "HHT", "Display":"Household Type"},{"Value": "HINCP", "Display":"Household Income"},];
 var neighborhoods=[];
 
 function onPageLoad()
@@ -34,7 +37,9 @@ function initialize() {
       });*/
 
   //geoJson version
-  map.data.loadGeoJson('https://www.dropbox.com/s/civ8ghtyu4glxgt/neighborhoods.json?dl=1');
+//  map.data.loadGeoJson('https://www.dropbox.com/s/civ8ghtyu4glxgt/neighborhoods.json?dl=1');
+map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
+
 
   //credit Tushar Gupta
   var strictBounds = new google.maps.LatLngBounds(
@@ -138,94 +143,323 @@ function getResults(){
   xhr.send();
 }
 
+//TODO
+//how to call two different functions - if two categories
 function onResponse( evt )
 {
-  //removes previous charts
+  //iterate over keys here instead of in smaller methods
   var chartDiv = document.getElementById('chart_div');
   while (chartDiv.hasChildNodes()) {
     chartDiv.removeChild(chartDiv.lastChild);
   }
-
   var jsonData=JSON.parse(evt.target.responseText);
-  if (jsonData.dataType=="HHL"){
+  if (jsonData.dataType=="HHL" || jsonData.dataType2=="HHL"){
+    console.log('hhl');
     HHL(jsonData);
   }
-  if (jsonData.dataType=="FS"){
+  if (jsonData.dataType=="FS" || jsonData.dataType2 =="FS"){
     FS(jsonData);
   }
-  if (jsonData.dataType=="RNTP"){
+  if (jsonData.dataType=="RNTP"|| jsonData.dataType2 =="RNTP"){
     RNTP(jsonData);
   }
-  if (jsonData.dataType=="VACS"){
+  if (jsonData.dataType=="VACS"|| jsonData.dataType2 =="VACS"){
     VACS(jsonData);
+  }
+  if (jsonData.dataType=="MV"|| jsonData.dataType2 =="MV"){
+    MV(jsonData);
+  }
+  if (jsonData.dataType=="YBL"|| jsonData.dataType2 =="YBL"){
+    YBL(jsonData);
+  }
+  if (jsonData.dataType=="TAXP"|| jsonData.dataType2 =="TAXP"){
+    TAXP(jsonData);
+  }
+  if (jsonData.dataType=="VALP"|| jsonData.dataType2 =="VALP"){
+    VALP(jsonData);
+  }
+}
+
+function VALP(info){
+
+}
+function YBL(info){
+  console.log('here');
+  for(var key in info.dataList){
+    var a=0;
+    var b=0;
+    var c=0;
+    var d=0;
+    var e=0;
+    var f=0;
+    var g=0;
+    var h=0;
+    var i=0;
+    var j=0;
+    var k=0;
+    var l=0;
+    var m=0;
+    var n=0;
+    var o=0;
+    var p=0;
+    var q=0;
+    if(info.flag2006==true || info.flag2007==true){
+      //TODO
+    }
+    else if(info.flag2008==true){
+      for (var i=0; i<info.dataList[key].length; i++){
+        if (info.dataList[key][i]==1){
+          f++;
+        }
+        if (info.dataList[key][i]==2){
+          g++;
+        }
+        if (info.dataList[key][i]==3){
+          h++;
+        }
+        if (info.dataList[key][i]==4){
+          i++;
+        }
+        if (info.dataList[key][i]==5){
+          j++;
+        }
+        if (info.dataList[key][i]==6){
+          k++;
+        }
+        if (info.dataList[key][i]==7){
+          l++;
+        }
+        if (info.dataList[key][i]==8){
+          m++;
+        }
+        if (info.dataList[key][i]==9){
+          n++;
+        }
+        if (info.dataList[key][i]==10){
+          o++;
+        }
+        if (info.dataList[key][i]==11){
+          p++;
+        }
+        if (info.dataList[key][i]==12){
+          q++;
+        }
+      }
+    }
+    else{
+      console.log('yoyo');
+      for (var i=0; i<info.dataList[key].length; i++){
+        if (info.dataList[key][i]==1){
+          q++;
+        }
+        if (info.dataList[key][i]==2){
+          p++;
+        }
+        if (info.dataList[key][i]==3){
+          o++;
+        }
+        if (info.dataList[key][i]==4){
+          n++;
+        }
+        if (info.dataList[key][i]==5){
+          m++;
+        }
+        if (info.dataList[key][i]==6){
+          l++;
+        }
+        if (info.dataList[key][i]==7){
+          k++;
+        }
+        if (info.dataList[key][i]==8){
+          j++;
+        }
+        if (info.dataList[key][i]==9){
+          i++;
+        }
+        if (info.dataList[key][i]==10){
+          h++;
+        }
+        if (info.dataList[key][i]==11){
+          g++;
+        }
+        if (info.dataList[key][i]==12){
+          f++;
+        }
+        if (info.dataList[key][i]==13){
+          e++;
+        }
+        if (info.dataList[key][i]==14){
+          d++;
+        }
+        if (info.dataList[key][i]==15){
+          c++;
+        }
+        if (info.dataList[key][i]==16){
+          b++;
+        }
+        if (info.dataList[key][i]==17){
+          a++;
+        }
+      }
+    }
+    drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key);
   }
 }
 
 function VACS(info){
-  var text = document.getElementById( 'testText' );
-  text.innerHTML="Vacancy stuff";
-  drawChart();
+  for(var key in info.dataList){
+    var a=0;
+    var b=0;
+    var c=0;
+    var d=0;
+    var e=0;
+    var f=0;
+    var g=0;
+    var h=0;
+    for (var i=0; i<info.dataList[key].length; i++){
+      if (info.dataList[key][i]==1){
+        a++;
+      }
+      else if(info.dataList[key][i]==2){
+        b++;
+      }
+      else if(info.dataList[key][i]==3){
+        c++;
+      }
+      else if(info.dataList[key][i]==4){
+        d++;
+      }
+      else if(info.dataList[key][i]==5){
+        e++;
+      }
+      else if(info.dataList[key][i]==6){
+        f++;
+      }
+      else if(info.dataList[key][i]==7){
+        g++;
+      }
+      else{
+        h++;
+
+      }
+    }
+    drawVACSChart(a,b,c,d,e,f,g,h,key);
+  }
 }
 
 function HHL(info){
-  for(var year in info.dataList){
+  for(var key in info.dataList){
     var english =0;
     var spanish=0;
     var indeu=0;
     var asian=0;
     var other=0;
-    for (var i=0; i<info.dataList[year].length; i++){
-      if (info.dataList[year][i] ==1){
+    for (var i=0; i<info.dataList[key].length; i++){
+      if (info.dataList[key][i] ==1){
         english++;
       }
-      if (info.dataList[year][i] ==2){
+      if (info.dataList[key][i] ==2){
         spanish++;
       }
-      if (info.dataList[year][i] ==3){
+      if (info.dataList[key][i] ==3){
         indeu++;
       }
-      if (info.dataList[year][i] ==4){
+      if (info.dataList[key][i] ==4){
         asian++;
       }
-      if (info.dataList[year][i] ==5){
+      if (info.dataList[key][i] ==5){
         other++;
       }
     }
-    drawHHLChart(english,spanish,indeu,asian,other, year);
+    drawHHLChart(english,spanish,indeu,asian,other, key);
   }
-
-
-
 }
+
 function RNTP(info){
-    var text = document.getElementById( 'testText' );
-    text.innerHTML="Rent stuff";
-}
-function FS(info){
-  var text = document.getElementById( 'testText' );
-  var totalYes=0;
-  var totalNo=0;
-  var totalVacant=0;
-  for (var i=0; i<info.dataList.length; i++){
-    if (info.dataList[i]==2){
-      totalNo++;
+  for(var key in info.dataList){
+    var totalYes=0;
+    var totalNo=0;
+    var totalVacant=0;
+    for (var i=0; i<info.dataList[key].length; i++){
+      if (info.dataList[key]==2){
+        totalNo++;
+      }
+      else if(info.dataList[key]==1){
+        totalYes++;
+      }
+      else{
+        totalVacant++;
+      }
     }
-    else if(info.dataList[i]==1){
-      totalYes++;
-    }
-    else{
-      totalVacant++;
-
-    }
+    drawRNTPChart(totalNo, totalYes, totalVacant);
   }
-
-  text.innerHTML = "No :"+totalNo+" Yes: "+totalYes+" Vacant: "+totalVacant;
-  drawFSChart(totalNo, totalYes, totalVacant);
 }
 
-function drawHHLChart(eng, span, indeu, asian, other, year) {
+function MV(info){
+  for(var key in info.dataList){
+    var a=0;
+    var b=0;
+    var c=0;
+    var d=0;
+    var e=0;
+    var f=0;
+    var g=0;
+    var h=0;
+    for (var i=0; i<info.dataList[key].length; i++){
+      if (info.dataList[key][i]==1){
+        a++;
+      }
+      else if(info.dataList[key][i]==2){
+        b++;
+      }
+      else if(info.dataList[key][i]==3){
+        c++;
+      }
+      else if(info.dataList[key][i]==4){
+        d++;
+      }
+      else if(info.dataList[key][i]==5){
+        e++;
+      }
+      else if(info.dataList[key][i]==6){
+        f++;
+      }
+      else if(info.dataList[key][i]==7){
+        g++;
+      }
+      else{
+        h++;
+
+      }
+    }
+    drawMVChart(a,b,c,d,e,f,g,h,key);
+  }
+}
+
+function FS(info){
+  for(var key in info.dataList){
+    var totalYes=0;
+    var totalNo=0;
+    var totalVacant=0;
+    for (var i=0; i<info.dataList[key].length; i++){
+      if (info.dataList[key][i]==2){
+        totalNo++;
+      }
+      else if(info.dataList[key][i]==1){
+        totalYes++;
+      }
+      else{
+        totalVacant++;
+      }
+    }
+    drawFSChart(totalNo, totalYes, totalVacant, key);
+  }
+}
+
+
+function drawHHLChart(eng, span, indeu, asian, other, key) {
     // Create the data table.
-    console.log('HHL CHART', eng, span, indeu, asian, other, year);
+    //console.log('HHL CHART', eng, span, indeu, asian, other, year);
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Topping');
     data.addColumn('number', 'Slices');
@@ -237,7 +471,7 @@ function drawHHLChart(eng, span, indeu, asian, other, year) {
       ['Other', other],
 
     ]);
-    var options = {'title':year+': Distribution of Household Languages',
+    var options = {'title':key+': Distribution of Household Languages',
                    'width':350,
                    'height':350};
     var div = document.getElementById('chart_div');
@@ -248,7 +482,58 @@ function drawHHLChart(eng, span, indeu, asian, other, year) {
     chart.draw(data, options);
   }
 
-function drawFSChart(no, yes, vac) {
+function drawVACSChart(a,b,c,d,e,f,g,h,key) {
+    // TODO NEED A DIFFERENT CHART
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topping');
+    data.addColumn('number', 'Slices');
+    data.addRows([
+      ['For Rent', a],
+      ['Rented (not occupied)', b],
+      ['For Sale', c],
+      ['Sold (not occupies)', d],
+      ['Season Use', e],
+      ['Migratory Workers', f],
+      ['Other', g],
+      ['Occupied', h],
+
+    ]);
+    var options = {'title':key+': Vacancy Status',
+                   'width':350,
+                   'height':350};
+    var div = document.getElementById('chart_div');
+    var chartDiv = document.createElement('div');
+    chartDiv.setAttribute("style", "display: inline-block;")
+    div.appendChild(chartDiv);
+    var chart = new google.visualization.PieChart(chartDiv);
+    chart.draw(data, options);
+  }
+
+function drawMVChart(a,b,c,d,e,f,g,h,key) {
+    var data = new google.visualization.arrayToDataTable([
+         ['Time', 'value', { role: 'style' }],
+         ['<12 Months', a, '#b87333'],            // RGB value
+         ['12-23 Months', b, 'purple'],
+         ['2-4 Years', c, 'green'],
+         ['5-9 Years', d, 'blue'],
+         ['10-19 Years', e, 'yellow'],
+         ['20-29 Years', f, 'red'],
+         ['30+ Years', g, 'black'],
+         ['Vacant', h, 'gold'],
+      ]);
+
+    var options = {'title':key+': Year Moved into Properties',
+                   'width':350,
+                   'height':350};
+    var div = document.getElementById('chart_div');
+    var chartDiv = document.createElement('div');
+    chartDiv.setAttribute("style", "display: inline-block;")
+    div.appendChild(chartDiv);
+    var chart = new google.visualization.ColumnChart(chartDiv);
+    chart.draw(data, options);
+  }
+
+function drawFSChart(no, yes, vac, key) {
         // Create the data table.
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Topping');
@@ -261,15 +546,54 @@ function drawFSChart(no, yes, vac) {
     ]);
 
     // Set chart options
-    var options = {'title':'Percentage of Households using Food Stamps',
+    var options = {'title':key+': Percentage of Households using Food Stamps',
                    'width':400,
                    'height':300};
 
     // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    var div = document.getElementById('chart_div');
+    var chartDiv = document.createElement('div');
+    chartDiv.setAttribute("style", "display: inline-block;")
+    div.appendChild(chartDiv);
+    var chart = new google.visualization.PieChart(chartDiv);
     chart.draw(data, options);
   }
 
+function drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key){
+  var data = new google.visualization.DataTable();
+  console.log('here');
+  data.addColumn('string', 'Topping');
+  data.addColumn('number', 'Slices');
+  data.addRows([
+    ['2013', a],
+    ['2012', b],
+    ['2011', c],
+    ['2010', d],
+    ['2009', e],
+    ['2008', f],
+    ['2007', g],
+    ['2006', h],
+    ['2005', i],
+    ['2000-2004', j],
+    ['1990-1999', k],
+    ['1980-1989', l],
+    ['1970-1979', m],
+    ['1960-1969', n],
+    ['1950-1959', o],
+    ['1940-1949', p],
+    ['1939 or earlier', q],
+
+  ]);
+  var options = {'title':key+': Year Structure Built',
+                 'width':350,
+                 'height':350};
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
+  chart.draw(data, options);
+}
 //don't think this is doing anything
 function sendUpdateReq()
 {
