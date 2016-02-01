@@ -19,14 +19,11 @@ function serveDynamic( req, res )
         var category = qs_params.category;
         //undefined if does not exist - but thats ok?
         var year2=qs_params.year2;
-        var flag2006=false;
-        var flag2007=false;
-        var flag2008=false;
         var category2=qs_params.cat2;
         var puma2=qs_params.puma2;
         var data="";
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
-        var query = "SELECT * FROM House_Data2 WHERE PUMA = ? AND YEAR = ?"
+        var query = "SELECT * FROM House_Data3 WHERE PUMA = ? AND YEAR = ?"
 
         //1 OR MULTIPLE YEAR QUERY
         console.log(category2, puma2, year2);
@@ -36,7 +33,7 @@ function serveDynamic( req, res )
             function( err, rows ) {
               puma=rows[0].PUMA;
               //build sql string
-              var sqlString = "SELECT * FROM House_Data2 WHERE PUMA = ? AND (YEAR = "+year;
+              var sqlString = "SELECT * FROM House_Data3 WHERE PUMA = ? AND (YEAR = "+year;
               if (year2=="") { var dif = 0;}
               else { var dif = Math.abs(year-year2); }
               for(var i=0; i<dif; i++){
@@ -52,9 +49,6 @@ function serveDynamic( req, res )
                   {
                     if( !(rows[i]['YEAR'] in dataToSend))
                     {
-                      if(rows[i]['YEAR']=='2006'){flag2006 = true;}
-                      else if(rows[i]['YEAR']=='2007'){flag2007= true;}
-                      else if(rows[i]['YEAR']=='2008'){flag2008 = true;}
                       dataToSend[rows[i]['YEAR']] = [ rows[i][category] ];
                     }
                     else {
@@ -63,9 +57,6 @@ function serveDynamic( req, res )
                   }
 
                   var json = {};
-                  json.flag2006=flag2006;
-                  json.flag2007=flag2007;
-                  json.flag2008=flag2008;
                   json.dataList=dataToSend;
                   json.dataType=category;
                   res.writeHead( 200 );
@@ -79,13 +70,12 @@ function serveDynamic( req, res )
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ? ", [ puma ],
             function( err, rows ) {
               puma=rows[0].PUMA;
-              //puma2=rows[1].PUMA;
-              //console.log(puma, puma2)
-              console.log("double cat");
-              db.all( "SELECT * FROM House_Data2 WHERE PUMA = ?  AND YEAR = ?",[puma, year],
+              console.log("double cat", puma, year, category, category2);
+              db.all( "SELECT * FROM House_Data3 WHERE PUMA = "+puma+"  AND YEAR = "+year,
                 function( err, rows ) {
                   if(err){ console.log(err);}
                   var dataToSend={};
+                  console.log(rows.length, category, category2);
                   for( var i = 0; i < rows.length; i++ )
                   {
                     if( !(category in dataToSend) && !(category2 in dataToSend))
@@ -93,15 +83,14 @@ function serveDynamic( req, res )
                       dataToSend[category] = [];
                       dataToSend[category2] =[];
                     }
-                    dataToSend[category] =  rows[i][category];
-                    dataToSend[category2] =  rows[i][category2] ;
+                    dataToSend[category].push(rows[i][category]);
+                    dataToSend[category2].push(rows[i][category2] );
                   }
                   var json = {};
-              //    json.dataList=dataToSend;
-              //    json.dataType=category;
-              //    json.dataType2=category2;
+                  json.dataList=dataToSend;
+                  json.dataType=category;
                   res.writeHead( 200 );
-                  res.end(JSON.stringify(dataToSend));
+                  res.end(JSON.stringify(json));
                 }
               );
           }
@@ -116,7 +105,7 @@ function serveDynamic( req, res )
               puma2=rows[1].PUMA;
               console.log(puma, puma2)
               console.log("double puma");
-              db.all( "SELECT * FROM House_Data2 WHERE (PUMA = ? OR PUMA = ?) AND YEAR = ?",[puma, puma2, year],
+              db.all( "SELECT * FROM House_Data3 WHERE (PUMA = ? OR PUMA = ?) AND YEAR = ?",[puma, puma2, year],
                 function( err, rows ) {
                   if(err){ console.log(err);}
                   var dataToSend={};

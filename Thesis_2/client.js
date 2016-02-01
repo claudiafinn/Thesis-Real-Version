@@ -1,6 +1,6 @@
 
 //var oneYear = true;
-var years =["2007", "2008", "2009", "2010", "2011", "2012", "2013"];
+var years =["2006","2007", "2008", "2009", "2010", "2011", "2012", "2013"];
 var categories = [{"Value": "FS", "Display":"Food Stamp"}, {"Value": "VACS", "Display":"Vacancy Status"},
               {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"},
             {"Value": "MV", "Display":"Years Lived"},{"Value": "YBL", "Display":"Year Built"},
@@ -30,29 +30,17 @@ function initialize() {
       center:{lat: 39.737760, lng: -105.000755}
   });
 
-  //kml version
-  /*  var ctaLayer = new google.maps.KmlLayer({
-        url: "https://www.dropbox.com/s/ca9jlq7hbxg3x4n/neighborhoods.kml?dl=1",
-        map: map
-      });*/
-
-  //geoJson version
-//  map.data.loadGeoJson('https://www.dropbox.com/s/civ8ghtyu4glxgt/neighborhoods.json?dl=1');
-map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
-
+  map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
 
   //credit Tushar Gupta
   var strictBounds = new google.maps.LatLngBounds(
     new google.maps.LatLng(28.70, -54.50),
     new google.maps.LatLng(48.85, -55.90)
   );
-
   // Listen for the dragend event
   google.maps.event.addListener(map, 'dragend', function () {
       if (strictBounds.contains(map.getCenter())) return;
-
       // We're out of bounds - Move the map back within the bounds
-
       var c = map.getCenter(),
           x = c.lng(),
           y = c.lat(),
@@ -68,7 +56,6 @@ map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
 
       map.setCenter(new google.maps.LatLng(y, x));
   });
-
   // Limit the zoom level
   google.maps.event.addListener(map, 'zoom_changed', function () {
       if (map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
@@ -131,7 +118,7 @@ function getResults(){
   if (drop4 != null){ drop4select = drop4.options[drop4.selectedIndex].text; }
 
   var drop5 = document.getElementById('category_select2');
-  if (drop5 != null){ drop5select = drop5.options[drop5.selectedIndex].text;}
+  if (drop5 != null){ drop5select = drop5.options[drop5.selectedIndex].value;}
 
   var drop6 = document.getElementById('puma_select2');
   if (drop6 != null){ drop6select = drop6.options[drop6.selectedIndex].text;}
@@ -153,307 +140,257 @@ function onResponse( evt )
     chartDiv.removeChild(chartDiv.lastChild);
   }
   var jsonData=JSON.parse(evt.target.responseText);
-  if (jsonData.dataType=="HHL" || jsonData.dataType2=="HHL"){
-    console.log('hhl');
-    HHL(jsonData);
-  }
-  if (jsonData.dataType=="FS" || jsonData.dataType2 =="FS"){
-    FS(jsonData);
-  }
-  if (jsonData.dataType=="RNTP"|| jsonData.dataType2 =="RNTP"){
-    RNTP(jsonData);
-  }
-  if (jsonData.dataType=="VACS"|| jsonData.dataType2 =="VACS"){
-    VACS(jsonData);
-  }
-  if (jsonData.dataType=="MV"|| jsonData.dataType2 =="MV"){
-    MV(jsonData);
-  }
-  if (jsonData.dataType=="YBL"|| jsonData.dataType2 =="YBL"){
-    YBL(jsonData);
-  }
-  if (jsonData.dataType=="TAXP"|| jsonData.dataType2 =="TAXP"){
-    TAXP(jsonData);
-  }
-  if (jsonData.dataType=="VALP"|| jsonData.dataType2 =="VALP"){
-    VALP(jsonData);
-  }
-}
-
-function VALP(info){
-
-}
-function YBL(info){
-  console.log('here');
-  for(var key in info.dataList){
-    var a=0;
-    var b=0;
-    var c=0;
-    var d=0;
-    var e=0;
-    var f=0;
-    var g=0;
-    var h=0;
-    var i=0;
-    var j=0;
-    var k=0;
-    var l=0;
-    var m=0;
-    var n=0;
-    var o=0;
-    var p=0;
-    var q=0;
-    if(info.flag2006==true || info.flag2007==true){
-      //TODO
+  //TODO
+  //if key is the category, need to change this
+  for (var key in jsonData.dataList){
+    console.log(key);
+    if (jsonData.dataType=="HHL" || key=="HHL"){
+      HHL(jsonData.dataList[key], key );
     }
-    else if(info.flag2008==true){
-      for (var i=0; i<info.dataList[key].length; i++){
-        if (info.dataList[key][i]==1){
-          f++;
-        }
-        if (info.dataList[key][i]==2){
-          g++;
-        }
-        if (info.dataList[key][i]==3){
-          h++;
-        }
-        if (info.dataList[key][i]==4){
-          i++;
-        }
-        if (info.dataList[key][i]==5){
-          j++;
-        }
-        if (info.dataList[key][i]==6){
-          k++;
-        }
-        if (info.dataList[key][i]==7){
-          l++;
-        }
-        if (info.dataList[key][i]==8){
-          m++;
-        }
-        if (info.dataList[key][i]==9){
-          n++;
-        }
-        if (info.dataList[key][i]==10){
-          o++;
-        }
-        if (info.dataList[key][i]==11){
-          p++;
-        }
-        if (info.dataList[key][i]==12){
-          q++;
-        }
-      }
+    if (jsonData.dataType=="FS" || key =="FS"){
+      FS(jsonData.dataList[key], key );
+    }
+    if (jsonData.dataType=="RNTP"|| key =="RNTP"){
+      RNTP(jsonData.dataList[key], key );
+    }
+    if (jsonData.dataType=="VACS"|| key =="VACS"){
+      VACS(jsonData.dataList[key], key );
+    }
+    if (jsonData.dataType=="MV"|| key =="MV"){
+      MV(jsonData.dataList[key], key );
+    }
+    if (jsonData.dataType=="YBL"|| key =="YBL"){
+      YBL(jsonData.dataList[key], key );
+    }
+    if (jsonData.dataType=="TAXP"|| key =="TAXP"){
+      TAXP(jsonData.dataList[key], key );
+    }
+    if (jsonData.dataType=="VALP"|| key =="VALP"){
+      VALP(jsonData.dataList[key], key );
+    }
+  }
+}
+
+function VALP(info, key){
+
+}
+function YBL(info, key){
+  var a=0;
+  var b=0;
+  var c=0;
+  var d=0;
+  var e=0;
+  var f=0;
+  var g=0;
+  var h=0;
+  var i=0;
+  var j=0;
+  var k=0;
+  var l=0;
+  var m=0;
+  var n=0;
+  var o=0;
+  var p=0;
+  var q=0;
+
+  for (var i=0; i<info.length; i++){
+    if (info[i]==1){
+     q++;
+    }
+    if (info[i]==2){
+      p++;
+    }
+    if (info[i]==3){
+      o++;
+    }
+    if (info[i]==4){
+      n++;
+    }
+    if (info[i]==5){
+      m++;
+    }
+    if (info[i]==6){
+      l++;
+    }
+    if (info[i]==7){
+      k++;
+    }
+    if (info[i]==8){
+      j++;
+    }
+    if (info[i]==9){
+      i++;
+    }
+    if (info[i]==10){
+      h++;
+    }
+    if (info[i]==11){
+      g++;
+    }
+    if (info[i]==12){
+      f++;
+    }
+    if (info[i]==13){
+      e++;
+    }
+    if (info[i]==14){
+      d++;
+    }
+    if (info[i]==15){
+      c++;
+    }
+    if (info[i]==16){
+      b++;
+    }
+    if (info[i]==17){
+      a++;
+    }
+  }
+  drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key);
+}
+
+function VACS(info, key){
+  console.log('vacs')
+
+  var a=0;
+  var b=0;
+  var c=0;
+  var d=0;
+  var e=0;
+  var f=0;
+  var g=0;
+  var h=0;
+  for (var i=0; i<info.length; i++){
+    if (info[i]==1){
+      a++;
+    }
+    else if(info[i]==2){
+      b++;
+    }
+    else if(info[i]==3){
+      c++;
+    }
+    else if(info[i]==4){
+      d++;
+    }
+    else if(info[i]==5){
+      e++;
+    }
+    else if(info[i]==6){
+      f++;
+    }
+    else if(info[i]==7){
+      g++;
     }
     else{
-      console.log('yoyo');
-      for (var i=0; i<info.dataList[key].length; i++){
-        if (info.dataList[key][i]==1){
-          q++;
-        }
-        if (info.dataList[key][i]==2){
-          p++;
-        }
-        if (info.dataList[key][i]==3){
-          o++;
-        }
-        if (info.dataList[key][i]==4){
-          n++;
-        }
-        if (info.dataList[key][i]==5){
-          m++;
-        }
-        if (info.dataList[key][i]==6){
-          l++;
-        }
-        if (info.dataList[key][i]==7){
-          k++;
-        }
-        if (info.dataList[key][i]==8){
-          j++;
-        }
-        if (info.dataList[key][i]==9){
-          i++;
-        }
-        if (info.dataList[key][i]==10){
-          h++;
-        }
-        if (info.dataList[key][i]==11){
-          g++;
-        }
-        if (info.dataList[key][i]==12){
-          f++;
-        }
-        if (info.dataList[key][i]==13){
-          e++;
-        }
-        if (info.dataList[key][i]==14){
-          d++;
-        }
-        if (info.dataList[key][i]==15){
-          c++;
-        }
-        if (info.dataList[key][i]==16){
-          b++;
-        }
-        if (info.dataList[key][i]==17){
-          a++;
-        }
-      }
+      h++;
+
     }
-    drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key);
   }
+  drawVACSChart(a,b,c,d,e,f,g,h,key);
 }
 
-function VACS(info){
-  for(var key in info.dataList){
-    var a=0;
-    var b=0;
-    var c=0;
-    var d=0;
-    var e=0;
-    var f=0;
-    var g=0;
-    var h=0;
-    for (var i=0; i<info.dataList[key].length; i++){
-      if (info.dataList[key][i]==1){
-        a++;
-      }
-      else if(info.dataList[key][i]==2){
-        b++;
-      }
-      else if(info.dataList[key][i]==3){
-        c++;
-      }
-      else if(info.dataList[key][i]==4){
-        d++;
-      }
-      else if(info.dataList[key][i]==5){
-        e++;
-      }
-      else if(info.dataList[key][i]==6){
-        f++;
-      }
-      else if(info.dataList[key][i]==7){
-        g++;
-      }
-      else{
-        h++;
-
-      }
-    }
-    drawVACSChart(a,b,c,d,e,f,g,h,key);
-  }
-}
-
-function HHL(info){
-  for(var key in info.dataList){
+function HHL(info, key){
     var english =0;
     var spanish=0;
     var indeu=0;
     var asian=0;
     var other=0;
-    for (var i=0; i<info.dataList[key].length; i++){
-      if (info.dataList[key][i] ==1){
+    for (var i=0; i<info.length; i++){
+      if (info[i] ==1){
         english++;
       }
-      if (info.dataList[key][i] ==2){
+      if (info[i] ==2){
         spanish++;
       }
-      if (info.dataList[key][i] ==3){
+      if (info[i] ==3){
         indeu++;
       }
-      if (info.dataList[key][i] ==4){
+      if (info[i] ==4){
         asian++;
       }
-      if (info.dataList[key][i] ==5){
+      if (info[i] ==5){
         other++;
       }
     }
     drawHHLChart(english,spanish,indeu,asian,other, key);
-  }
+
 }
 
-function RNTP(info){
-  for(var key in info.dataList){
-    var totalYes=0;
-    var totalNo=0;
-    var totalVacant=0;
-    for (var i=0; i<info.dataList[key].length; i++){
-      if (info.dataList[key]==2){
-        totalNo++;
-      }
-      else if(info.dataList[key]==1){
-        totalYes++;
-      }
-      else{
-        totalVacant++;
-      }
+function RNTP(info, key){
+  var totalYes=0;
+  var totalNo=0;
+  var totalVacant=0;
+  for (var i=0; i<info.length; i++){
+    if (info[i]==2){
+      totalNo++;
     }
-    drawRNTPChart(totalNo, totalYes, totalVacant);
+    else if(info[i]==1){
+      totalYes++;
+    }
+    else{
+      totalVacant++;
+    }
   }
+  drawRNTPChart(totalNo, totalYes, totalVacant, key);
 }
 
-function MV(info){
-  for(var key in info.dataList){
-    var a=0;
-    var b=0;
-    var c=0;
-    var d=0;
-    var e=0;
-    var f=0;
-    var g=0;
-    var h=0;
-    for (var i=0; i<info.dataList[key].length; i++){
-      if (info.dataList[key][i]==1){
-        a++;
-      }
-      else if(info.dataList[key][i]==2){
-        b++;
-      }
-      else if(info.dataList[key][i]==3){
-        c++;
-      }
-      else if(info.dataList[key][i]==4){
-        d++;
-      }
-      else if(info.dataList[key][i]==5){
-        e++;
-      }
-      else if(info.dataList[key][i]==6){
-        f++;
-      }
-      else if(info.dataList[key][i]==7){
-        g++;
-      }
-      else{
-        h++;
-
-      }
+function MV(info, key){
+  var a=0;
+  var b=0;
+  var c=0;
+  var d=0;
+  var e=0;
+  var f=0;
+  var g=0;
+  var h=0;
+  for (var i=0; i<info.length; i++){
+    if (info[i]==1){
+      a++;
     }
-    drawMVChart(a,b,c,d,e,f,g,h,key);
+    else if(info[i]==2){
+      b++;
+    }
+    else if(info[i]==3){
+      c++;
+    }
+    else if(info[i]==4){
+      d++;
+    }
+    else if(info[i]==5){
+      e++;
+    }
+    else if(info[i]==6){
+      f++;
+    }
+    else if(info[i]==7){
+      g++;
+    }
+    else{
+      h++;
+
+    }
   }
+  drawMVChart(a,b,c,d,e,f,g,h,key);
 }
 
-function FS(info){
-  for(var key in info.dataList){
-    var totalYes=0;
-    var totalNo=0;
-    var totalVacant=0;
-    for (var i=0; i<info.dataList[key].length; i++){
-      if (info.dataList[key][i]==2){
-        totalNo++;
-      }
-      else if(info.dataList[key][i]==1){
-        totalYes++;
-      }
-      else{
-        totalVacant++;
-      }
+function FS(info, key){
+  console.log('fs');
+  var totalYes=0;
+  var totalNo=0;
+  var totalVacant=0;
+  for (var i=0; i<info.length; i++){
+    if (info[i]==2){
+      totalNo++;
     }
-    drawFSChart(totalNo, totalYes, totalVacant, key);
+    else if(info[i]==1){
+      totalYes++;
+    }
+    else{
+      totalVacant++;
+    }
   }
+  drawFSChart(totalNo, totalYes, totalVacant, key);
 }
 
 
