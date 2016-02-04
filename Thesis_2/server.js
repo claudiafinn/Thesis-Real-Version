@@ -14,59 +14,93 @@ function serveDynamic( req, res )
     var qs_params = qs.parse( req.url.split( "?" )[ 1 ] );
     if( req.url.indexOf( "getData?" ) >= 0 )
     {
-        var puma = qs_params.puma;
+        var neighborhood1 = qs_params.puma;
+        var neighborhood2=qs_params.puma2;
         var year = qs_params.year;
-        var category = qs_params.category;
-        //undefined if does not exist - but thats ok?
         var year2=qs_params.year2;
-        var category2=qs_params.cat2;
-        var puma2=qs_params.puma2;
+        var category = qs_params.category;
         var data="";
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
-        var query = "SELECT * FROM House_Data3 WHERE PUMA = ? AND YEAR = ?"
 
-        //1 OR MULTIPLE YEAR QUERY
-        console.log(category2, puma2, year2);
-        if( (category2 == "") &&  (puma2 == "")){
-          //get corresponding PUMA from NEIGHBORHOOD
-          db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ?", [ puma ],
-            function( err, rows ) {
-              puma=rows[0].PUMA;
-              //build sql string
-              var sqlString = "SELECT * FROM House_Data3 WHERE PUMA = ? AND (YEAR = "+year;
-              if (year2=="") { var dif = 0;}
-              else { var dif = Math.abs(year-year2); }
-              for(var i=0; i<dif; i++){
-                year++;
-                sqlString+=" OR YEAR = "+year
-              }
-              sqlString+=")";
-              db.all(sqlString,[puma],
-                function( err, rows ) {
-                  if(err){ console.log(err);}
-                  var dataToSend={};
-                  for( var i = 0; i < rows.length; i++ )
-                  {
-                    if( !(rows[i]['YEAR'] in dataToSend))
-                    {
-                      dataToSend[rows[i]['YEAR']] = [ rows[i][category] ];
-                    }
-                    else {
-                      dataToSend[rows[i]['YEAR']].push(rows[i][category]);
-                    }
-                  }
-
-                  var json = {};
-                  json.dataList=dataToSend;
-                  json.dataType=category;
-                  res.writeHead( 200 );
-                  res.end(JSON.stringify(json));
-              });
-          });
+        var sqlString1 = "SELECT * FROM NEIGHBORHOODS WHERE "
+        console.log("N2",neighborhood2);
+        if(neighborhood2==" "){
+          sqlString1+="Neighborhood = \""+neighborhood1+'\"';
         }
+        else{
+          sqlString1+="(Neighborhood = \""+neighborhood1 +"\" OR Neighborhood = \""+neighborhood2+"\")";
+        }
+        console.log(sqlString1);
+        db.all(sqlString1,
+
+          function( err, rows ) {
+            var pumaData = {};
+
+            for(var i=0; i<rows.length; i++){
+              if (rows[i]['PUMA'] in pumaData){
+                if(rows[i]['Neighborhood'] in pumaData[rows[i]['PUMA']]){
+                  pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']].push(rows[i]['CensusTract']);
+                }
+                else{
+                  pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']] = [ rows[i]['CensusTract']];
+                }
+              }
+              else{
+                pumaData[rows[i]['PUMA']]={};
+                pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']] = [rows[i]['CensusTract']];
+              }
+            }
+
+            console.log(pumaData);
+            var sqlString2 = "SELECT * FROM House_Data3 WHERE (PUMA =  ";
+            var first = true;
+            for (var key in pumaData){
+              if(first ==  true){sqlString2+=key}
+              else{
+                sqlString2 +=" OR PUMA = "+key;
+              }
+              first = false;
+            }
+            sqlString2+=" )";
+            console.log(sqlString2);
+            if (year2=="") { var dif = 0;}
+            else { var dif = Math.abs(year-year2); }
+            sqlString2+="AND (YEAR = "+year;
+            for(var i=0; i<dif; i++){
+              year++;
+              sqlString2+=" OR YEAR = "+year
+            }
+            sqlString2+=")";
+
+            var dataToSend={};
+            for (var key in pumaData){
+              dataToSend[key]={};
+            }
+            db.all(sqlString2,
+              function( err, rows ) {
+                if(err){ console.log(err);}
+                for( var i = 0; i < rows.length; i++ )
+                {
+                  if( !(rows[i]['YEAR'] in dataToSend[rows[i]['PUMA']]))
+                  {
+                    dataToSend[rows[i]['PUMA']][rows[i]['YEAR']] = [ rows[i][category] ];
+                  }
+                  else {
+                    dataToSend[rows[i]['PUMA']][rows[i]['YEAR']].push(rows[i][category]);
+                  }
+                }
+                var json = {};
+                json.dataList=dataToSend;
+                json.dataType=category;
+                json.neighborhoods = pumaData;
+                res.writeHead( 200 );
+                res.end(JSON.stringify(json));
+            });
+        });
 
         //TODO
-        else if(category2 !=""){
+        //maybe won't do multiple categores
+        /*else if(category2 !=""){
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ? ", [ puma ],
             function( err, rows ) {
               puma=rows[0].PUMA;
@@ -95,14 +129,19 @@ function serveDynamic( req, res )
               );
           }
         );
-        }
+      }*/
 
         //multiple nieghborhoods
-        else if( puma2 !=""){
+      /*  else if( puma2 !=""){
           db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ? OR Neighborhood = ?", [ puma, puma2 ],
             function( err, rows ) {
               puma=rows[0].PUMA;
               puma2=rows[1].PUMA;
+              var tracts=[];
+              for(var i=0; i<rows.length; i++){
+                tracts.push(rows[i]['CensusTract']);
+                console.log(rows[i]['CensusTract']);
+              }
               console.log(puma, puma2)
               console.log("double puma");
               db.all( "SELECT * FROM House_Data3 WHERE (PUMA = ? OR PUMA = ?) AND YEAR = ?",[puma, puma2, year],
@@ -124,37 +163,32 @@ function serveDynamic( req, res )
                   json.dataType=category;
                   res.writeHead( 200 );
                   res.end(JSON.stringify(json));
-                }
-              );
-          }
-        );
+              });
+          });
+        }*/
     }
-  }
 
     else if( req.url.indexOf( "load?" ) >= 0 )
     {
-
       var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
       var pumas =[]
       db.all( "SELECT NEIGHBORHOOD FROM NEIGHBORHOODS",
-            function( err, rows ) {
-                if(err){ console.log(err);}
-                for( var i = 0; i < rows.length; i++ )
-                {
-                  pumas.push(rows[i].Neighborhood);
-                }
-              var jsonData ={}
-              jsonData.puma_list=pumas;
-              res.writeHead( 200 );
-              res.end( JSON.stringify(jsonData ));
-            } );
+          function( err, rows ) {
+              if(err){ console.log(err);}
+              for( var i = 0; i < rows.length; i++ )
+              {
+                pumas.push(rows[i].Neighborhood);
+              }
+            var jsonData ={}
+            jsonData.puma_list=pumas;
+            res.writeHead( 200 );
+            res.end( JSON.stringify(jsonData ));
+        });
       }
-
-
     else
     {
-        res.writeHead( 404 );
-        res.end( "Unknown URL: "+req.url );
+      res.writeHead( 404 );
+      res.end( "Unknown URL: "+req.url );
     }
 }
 

@@ -134,39 +134,41 @@ function getResults(){
 //how to call two different functions - if two categories
 function onResponse( evt )
 {
-  //iterate over keys here instead of in smaller methods
   var chartDiv = document.getElementById('chart_div');
   while (chartDiv.hasChildNodes()) {
     chartDiv.removeChild(chartDiv.lastChild);
   }
+
   var jsonData=JSON.parse(evt.target.responseText);
-  //TODO
-  //if key is the category, need to change this
-  for (var key in jsonData.dataList){
-    console.log(key);
-    if (jsonData.dataType=="HHL" || key=="HHL"){
-      HHL(jsonData.dataList[key], key );
-    }
-    if (jsonData.dataType=="FS" || key =="FS"){
-      FS(jsonData.dataList[key], key );
-    }
-    if (jsonData.dataType=="RNTP"|| key =="RNTP"){
-      RNTP(jsonData.dataList[key], key );
-    }
-    if (jsonData.dataType=="VACS"|| key =="VACS"){
-      VACS(jsonData.dataList[key], key );
-    }
-    if (jsonData.dataType=="MV"|| key =="MV"){
-      MV(jsonData.dataList[key], key );
-    }
-    if (jsonData.dataType=="YBL"|| key =="YBL"){
-      YBL(jsonData.dataList[key], key );
-    }
-    if (jsonData.dataType=="TAXP"|| key =="TAXP"){
-      TAXP(jsonData.dataList[key], key );
-    }
-    if (jsonData.dataType=="VALP"|| key =="VALP"){
-      VALP(jsonData.dataList[key], key );
+  console.log('here1');
+  for (var puma in jsonData.dataList){
+    for (var year in jsonData.dataList[puma]){
+      if (jsonData.dataType=="HHL"){
+        HHL(jsonData.dataList[puma][year], puma );
+      }
+      if (jsonData.dataType=="FS"){
+        console.log (year, puma)
+        console.log('here2' + jsonData.dataList[puma]);
+        FS(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="RNTP"){
+        RNTP(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="VACS"){
+        VACS(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="MV"){
+        MV(jsonData.dataList[puma][year], puma );
+      }
+      if (jsonData.dataType=="YBL"){
+        YBL(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="TAXP"){
+        TAXP(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="VALP"){
+        VALP(jsonData.dataList[puma][year], puma );;
+      }
     }
   }
 }
@@ -542,7 +544,7 @@ function sendUpdateReq()
 }
 
 
-function addCategory(){
+/*function addCategory(){
   var div = document.getElementById( 'category_container' );
   var button = document.getElementById( 'add_category' );
   var new_select=document.createElement('select');
@@ -553,7 +555,7 @@ function addCategory(){
   }
   div.appendChild(new_select);
   div.removeChild(button);
-}
+}*/
 
 function addNeighborhood(){
   var div = document.getElementById( 'puma_container' );
@@ -566,6 +568,10 @@ function addNeighborhood(){
   }
   div.appendChild(new_select);
   div.removeChild(button);
+
+  var div2 = document.getElementById( 'year_container' );
+  var button2 = document.getElementById( 'add_year' );
+  div.removeChild(button2);
 }
 function addYear(){
   var div = document.getElementById( 'year_container' );
@@ -578,7 +584,8 @@ function addYear(){
   }
   div.appendChild(new_select);
   div.removeChild(button);
-//  oneYear=false;
 
-
+  var div2 = document.getElementById( 'puma_container' );
+  var button2 = document.getElementById( 'add_puma' );
+  div2.removeChild(button2);
 }
