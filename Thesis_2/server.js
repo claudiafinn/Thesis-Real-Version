@@ -22,8 +22,9 @@ function serveDynamic( req, res )
         var data="";
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
 
+        //check for problems in data
+        //male sure no sql bad stuff
         var sqlString1 = "SELECT * FROM NEIGHBORHOODS WHERE "
-        console.log("N2",neighborhood2);
         if(neighborhood2==" "){
           sqlString1+="Neighborhood = \""+neighborhood1+'\"';
         }
@@ -39,19 +40,21 @@ function serveDynamic( req, res )
             for(var i=0; i<rows.length; i++){
               if (rows[i]['PUMA'] in pumaData){
                 if(rows[i]['Neighborhood'] in pumaData[rows[i]['PUMA']]){
-                  pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']].push(rows[i]['CensusTract']);
+                  pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']][rows[i]['CensusTract']] = {};
                 }
                 else{
-                  pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']] = [ rows[i]['CensusTract']];
+                  pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']] = {};
+                  pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']][rows[i]['CensusTract']] = {};
                 }
               }
               else{
                 pumaData[rows[i]['PUMA']]={};
-                pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']] = [rows[i]['CensusTract']];
+                pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']] ={};
+                pumaData[rows[i]['PUMA']][rows[i]['Neighborhood']][rows[i]['CensusTract']]={};
               }
             }
 
-            console.log(pumaData);
+            //console.log(pumaData);
             var sqlString2 = "SELECT * FROM House_Data3 WHERE (PUMA =  ";
             var first = true;
             for (var key in pumaData){
@@ -62,7 +65,6 @@ function serveDynamic( req, res )
               first = false;
             }
             sqlString2+=" )";
-            console.log(sqlString2);
             if (year2=="") { var dif = 0;}
             else { var dif = Math.abs(year-year2); }
             sqlString2+="AND (YEAR = "+year;
@@ -89,12 +91,50 @@ function serveDynamic( req, res )
                     dataToSend[rows[i]['PUMA']][rows[i]['YEAR']].push(rows[i][category]);
                   }
                 }
-                var json = {};
+              /*  var json = {};
                 json.dataList=dataToSend;
                 json.dataType=category;
                 json.neighborhoods = pumaData;
-                res.writeHead( 200 );
-                res.end(JSON.stringify(json));
+*/
+                //build sqlString for retrieving all the population data
+                var sqlString3=" SELECT * FROM Population WHERE (CensusTract = "
+                for (puma in pumaData){
+                  for(neighborhood in pumaData[puma]){
+                    for(census in pumaData[puma][neighborhood]){
+                      sqlString3+=census +" OR CensusTract = ";
+                    }
+                  }
+                }
+                sqlString3+=" 0 )"
+
+                console.log(sqlString3);
+                db.all(sqlString3,
+                  function( err, rows ) {
+                    if(err){ console.log(err);}
+                    for (var i=0; i<rows.length; i++){
+                      for( puma in pumaData){
+                        for (neighborhood in pumaData[puma]){
+                          for (census in pumaData[puma][neighborhood]){
+                            console.log ("HERE", census, rows[i]['CensusTract'])
+                            if (rows[i]['CensusTract'] == census){
+                              pumaData[puma][neighborhood][census]["Population"] = rows[i]['Population2010'];
+                              pumaData[puma][neighborhood][census]["Population2000"] = rows[i]['Population2000'];
+                              pumaData[puma][neighborhood][census]["Housing"] = rows[i]['Housing2010'];
+                              pumaData[puma][neighborhood][census]["Housing2000"] = rows[i]['Housing2000'];
+                            }
+                          }
+                        }
+                      }
+                    }
+                    console.log(pumaData);
+                    var json = {};
+                    json.dataList=dataToSend;
+                    json.dataType=category;
+                    json.neighborhoods = pumaData;
+                    res.writeHead( 200 );
+                    res.end(JSON.stringify(json));
+
+                });
             });
         });
 

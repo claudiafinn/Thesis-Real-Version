@@ -1,11 +1,13 @@
 
 //var oneYear = true;
 var years =["2006","2007", "2008", "2009", "2010", "2011", "2012", "2013"];
-var categories = [{"Value": "FS", "Display":"Food Stamp"}, {"Value": "VACS", "Display":"Vacancy Status"},
-              {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"},
-            {"Value": "MV", "Display":"Years Lived"},{"Value": "YBL", "Display":"Year Built"},
-          {"Value": "VALP", "Display":"Property Value"},{"Value": "TAXP", "Display":"Property Taxes"},
-        {"Value": "HHT", "Display":"Household Type"},{"Value": "HINCP", "Display":"Household Income"},];
+var categories = [ {"Value": "VACS", "Display":"Vacancy Status"},{"Value": "FS", "Display":"Food Stamp"},
+                {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"},
+                {"Value": "MV", "Display":"Years Lived"},{"Value": "YBL", "Display":"Year Built"},
+                {"Value": "VALP", "Display":"Property Value"},{"Value": "TAXP", "Display":"Property Taxes"},
+                {"Value": "HHT", "Display":"Household Type"},{"Value": "HINCP", "Display":"Household Income"},
+                {"Value": "NP" , "Display" :"People per Household"},{"Value": "MULTG", "Display" :"Multigenerational Household"},
+                {"Value": "FPARC", "Display" :"Family Presence"},   {"Value": "WORKSTAT", "Display" :"Work Status"} ];
 var neighborhoods=[];
 
 function onPageLoad()
@@ -27,12 +29,19 @@ function initialize() {
   var minZoomLevel = 11;
   var map = new google.maps.Map(document.getElementById('map'), {
       zoom: minZoomLevel,
-      center:{lat: 39.737760, lng: -105.000755}
+      center:{lat: 39.737760, lng: -105.000755},
   });
 
   map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
 
   //credit Tushar Gupta
+  map.data.setStyle({
+    //fillColor: 'grey',
+    strokeWeight: 3,
+    strokeColor : 'grey',
+    fillOpacity : 0
+  });
+
   var strictBounds = new google.maps.LatLngBounds(
     new google.maps.LatLng(28.70, -54.50),
     new google.maps.LatLng(48.85, -55.90)
@@ -61,22 +70,17 @@ function initialize() {
       if (map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
   });
 
-/*  map.data.setStyle(function(feature) {
-    var color = 'purple';
-    if (feature.getProperty('isColorful')) {
-      color = feature.getProperty('color');
-    }
-    return
-    ({
-      fillColor: color,
-      strokeColor: color,
-      strokeWeight: 2
-    });
-  });*/
 
   map.data.addListener('mouseover', function(event) {
     map.data.revertStyle();
-    map.data.overrideStyle(event.feature, {strokeWeight: 8});
+    map.data.overrideStyle(event.feature, {strokeWeight: 6, fillOpacity : 0});
+  });
+
+  map.data.addListener('click', function(event) {
+    var name  = event.feature.getProperty('name');
+    console.log(name);
+    map.data.revertStyle();
+    map.data.overrideStyle(event.feature, {strokeWeight: 6, fillOpacity : 7});
   });
 }
 
@@ -125,13 +129,20 @@ function getResults(){
 
   var xhr = new XMLHttpRequest();
   xhr.addEventListener( "load", onResponse );
+  //encode uri component(str)
   xhr.open( "get", "getData?puma="+drop1select+"&year="+drop2select+"&category="+drop3select+"&year2="+drop4select+"&cat2="+drop5select+"&puma2="+drop6select, true );
 
   xhr.send();
 }
 
-//TODO
-//how to call two different functions - if two categories
+/*function doMapStuff(neighborhood){
+   var map = document.getElementById('map');
+   map.data.setStyle(function(feature){
+     var name = feature.getProperty('name');
+     console.log(name);
+   });
+}*/
+
 function onResponse( evt )
 {
   var chartDiv = document.getElementById('chart_div');
@@ -140,22 +151,35 @@ function onResponse( evt )
   }
 
   var jsonData=JSON.parse(evt.target.responseText);
-  console.log('here1');
+
+  var text = document.getElementById('testText');
+  for(var puma in jsonData.neighborhoods){
+    for (var neighborhood in jsonData.neighborhoods[puma]){
+      //var name = map.data.getProperty('name');
+      //console.log(name);
+      //doMapStuff(neighborhood);
+      var population =0;
+      var population2000=0;
+      for (census in jsonData.neighborhoods[puma][neighborhood]){
+        population+=jsonData.neighborhoods[puma][neighborhood][census]["Population"];
+        population2000+=jsonData.neighborhoods[puma][neighborhood][census]["Population2000"];
+        //console.log(census, jsonData.neighborhoods[puma][neighborhood][census]["Population"])
+      }
+      //console.log("pop", population)
+      text.innerHTML = "Population 2010 : " +population + " Population 2000 : " +population2000;
+    }
+  }
+
   for (var puma in jsonData.dataList){
     for (var year in jsonData.dataList[puma]){
-      if (jsonData.dataType=="HHL"){
-        HHL(jsonData.dataList[puma][year], puma );
+      if (jsonData.dataType=="VALP"){
+        VALP(jsonData.dataList[puma][year], puma );
       }
-      if (jsonData.dataType=="FS"){
-        console.log (year, puma)
-        console.log('here2' + jsonData.dataList[puma]);
-        FS(jsonData.dataList[puma][year], puma );;
+      if (jsonData.dataType=="TAXP"){
+        TAXP(jsonData.dataList[puma][year], puma );;
       }
       if (jsonData.dataType=="RNTP"){
         RNTP(jsonData.dataList[puma][year], puma );;
-      }
-      if (jsonData.dataType=="VACS"){
-        VACS(jsonData.dataList[puma][year], puma );;
       }
       if (jsonData.dataType=="MV"){
         MV(jsonData.dataList[puma][year], puma );
@@ -163,19 +187,110 @@ function onResponse( evt )
       if (jsonData.dataType=="YBL"){
         YBL(jsonData.dataList[puma][year], puma );;
       }
-      if (jsonData.dataType=="TAXP"){
-        TAXP(jsonData.dataList[puma][year], puma );;
+      if (jsonData.dataType=="NP"){
+        NP(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="HHT"){
+        HHT(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="FPARC"){
+        FPARC(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="WORKSTAT"){
+        WORKSTAT(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="MULTG"){
+        MULTG(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="HINCP"){
+        HINCP(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="HHL"){
+        HHL(jsonData.dataList[puma][year], puma );
+      }
+      if (jsonData.dataType=="FS"){
+        FS(jsonData.dataList[puma][year], puma );;
+      }
+      if (jsonData.dataType=="VACS"){
+        VACS(jsonData.dataList[puma][year], puma );;
       }
       if (jsonData.dataType=="VALP"){
         VALP(jsonData.dataList[puma][year], puma );;
       }
+      if (jsonData.dataType=="FINCP"){
+        FINCP(jsonData.dataList[puma][year], puma );;
+      }
+
     }
   }
 }
 
+//not done
 function VALP(info, key){
-
+  //
 }
+//not done
+function TAXP(info, key){
+  //
+}
+//done
+function RNTP(info, key){
+  var totalYes=0;
+  var totalNo=0;
+  var totalVacant=0;
+  for (var i=0; i<info.length; i++){
+    if (info[i]==2){
+      totalNo++;
+    }
+    else if(info[i]==1){
+      totalYes++;
+    }
+    else{
+      totalVacant++;
+    }
+  }
+  drawRNTPChart(totalNo, totalYes, totalVacant, key);
+}
+//done
+function MV(info, key){
+  var a=0;
+  var b=0;
+  var c=0;
+  var d=0;
+  var e=0;
+  var f=0;
+  var g=0;
+  var h=0;
+  for (var i=0; i<info.length; i++){
+    if (info[i]==1){
+      a++;
+    }
+    else if(info[i]==2){
+      b++;
+    }
+    else if(info[i]==3){
+      c++;
+    }
+    else if(info[i]==4){
+      d++;
+    }
+    else if(info[i]==5){
+      e++;
+    }
+    else if(info[i]==6){
+      f++;
+    }
+    else if(info[i]==7){
+      g++;
+    }
+    else{
+      h++;
+
+    }
+  }
+  drawMVChart(a,b,c,d,e,f,g,h,key);
+}
+//done
 function YBL(info, key){
   var a=0;
   var b=0;
@@ -250,7 +365,90 @@ function YBL(info, key){
   }
   drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key);
 }
+//not done
+function NP(info, key){
+  //
+}
+//not done
+function FPARC(info, key){
+  //
+}
+//done
+function MULTG(info, key){
+  var totalYes=0;
+  var totalNo=0;
+  var totalVacant=0;
+  for (var i=0; i<info.length; i++){
+    if (info[i]==1){
+      totalNo++;
+    }
+    else if(info[i]==2){
+      totalYes++;
+    }
+    else{
+      totalVacant++;
+    }
+  }
+  drawMULTGChart(totalNo, totalYes, totalVacant, key);
+}
+//not done
+//Prentiss - how to display this info
+function HINCP(info, key){
+  for (var i=0; i<info.length; i++){
+    if (info[i]<0){
+      //negative income
+    }
+    else if(info[i]){
 
+    }
+  }
+}
+//done
+function HHL(info, key){
+    var english =0;
+    var spanish=0;
+    var indeu=0;
+    var asian=0;
+    var other=0;
+    for (var i=0; i<info.length; i++){
+      if (info[i] ==1){
+        english++;
+      }
+      if (info[i] ==2){
+        spanish++;
+      }
+      if (info[i] ==3){
+        indeu++;
+      }
+      if (info[i] ==4){
+        asian++;
+      }
+      if (info[i] ==5){
+        other++;
+      }
+    }
+    drawHHLChart(english,spanish,indeu,asian,other, key);
+
+}
+//done
+function FS(info, key){
+  var totalYes=0;
+  var totalNo=0;
+  var totalVacant=0;
+  for (var i=0; i<info.length; i++){
+    if (info[i]==2){
+      totalNo++;
+    }
+    else if(info[i]==1){
+      totalYes++;
+    }
+    else{
+      totalVacant++;
+    }
+  }
+  drawFSChart(totalNo, totalYes, totalVacant, key);
+}
+//done
 function VACS(info, key){
   console.log('vacs')
 
@@ -292,162 +490,16 @@ function VACS(info, key){
   drawVACSChart(a,b,c,d,e,f,g,h,key);
 }
 
-function HHL(info, key){
-    var english =0;
-    var spanish=0;
-    var indeu=0;
-    var asian=0;
-    var other=0;
-    for (var i=0; i<info.length; i++){
-      if (info[i] ==1){
-        english++;
-      }
-      if (info[i] ==2){
-        spanish++;
-      }
-      if (info[i] ==3){
-        indeu++;
-      }
-      if (info[i] ==4){
-        asian++;
-      }
-      if (info[i] ==5){
-        other++;
-      }
-    }
-    drawHHLChart(english,spanish,indeu,asian,other, key);
 
+function drawVALPChart(){
+  //
 }
-
-function RNTP(info, key){
-  var totalYes=0;
-  var totalNo=0;
-  var totalVacant=0;
-  for (var i=0; i<info.length; i++){
-    if (info[i]==2){
-      totalNo++;
-    }
-    else if(info[i]==1){
-      totalYes++;
-    }
-    else{
-      totalVacant++;
-    }
-  }
-  drawRNTPChart(totalNo, totalYes, totalVacant, key);
+function drawTAXPChart(){
+  //
 }
-
-function MV(info, key){
-  var a=0;
-  var b=0;
-  var c=0;
-  var d=0;
-  var e=0;
-  var f=0;
-  var g=0;
-  var h=0;
-  for (var i=0; i<info.length; i++){
-    if (info[i]==1){
-      a++;
-    }
-    else if(info[i]==2){
-      b++;
-    }
-    else if(info[i]==3){
-      c++;
-    }
-    else if(info[i]==4){
-      d++;
-    }
-    else if(info[i]==5){
-      e++;
-    }
-    else if(info[i]==6){
-      f++;
-    }
-    else if(info[i]==7){
-      g++;
-    }
-    else{
-      h++;
-
-    }
-  }
-  drawMVChart(a,b,c,d,e,f,g,h,key);
+function drawRNTPChart(){
+  //
 }
-
-function FS(info, key){
-  console.log('fs');
-  var totalYes=0;
-  var totalNo=0;
-  var totalVacant=0;
-  for (var i=0; i<info.length; i++){
-    if (info[i]==2){
-      totalNo++;
-    }
-    else if(info[i]==1){
-      totalYes++;
-    }
-    else{
-      totalVacant++;
-    }
-  }
-  drawFSChart(totalNo, totalYes, totalVacant, key);
-}
-
-
-function drawHHLChart(eng, span, indeu, asian, other, key) {
-    // Create the data table.
-    //console.log('HHL CHART', eng, span, indeu, asian, other, year);
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Topping');
-    data.addColumn('number', 'Slices');
-    data.addRows([
-      ['English', eng],
-      ['Spanish', span],
-      ['Indo-European Language', indeu],
-      ['Asian and Pacific Islan Language', asian],
-      ['Other', other],
-
-    ]);
-    var options = {'title':key+': Distribution of Household Languages',
-                   'width':350,
-                   'height':350};
-    var div = document.getElementById('chart_div');
-    var chartDiv = document.createElement('div');
-    chartDiv.setAttribute("style", "display: inline-block;")
-    div.appendChild(chartDiv);
-    var chart = new google.visualization.PieChart(chartDiv);
-    chart.draw(data, options);
-  }
-
-function drawVACSChart(a,b,c,d,e,f,g,h,key) {
-    // TODO NEED A DIFFERENT CHART
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Topping');
-    data.addColumn('number', 'Slices');
-    data.addRows([
-      ['For Rent', a],
-      ['Rented (not occupied)', b],
-      ['For Sale', c],
-      ['Sold (not occupies)', d],
-      ['Season Use', e],
-      ['Migratory Workers', f],
-      ['Other', g],
-      ['Occupied', h],
-
-    ]);
-    var options = {'title':key+': Vacancy Status',
-                   'width':350,
-                   'height':350};
-    var div = document.getElementById('chart_div');
-    var chartDiv = document.createElement('div');
-    chartDiv.setAttribute("style", "display: inline-block;")
-    div.appendChild(chartDiv);
-    var chart = new google.visualization.PieChart(chartDiv);
-    chart.draw(data, options);
-  }
-
 function drawMVChart(a,b,c,d,e,f,g,h,key) {
     var data = new google.visualization.arrayToDataTable([
          ['Time', 'value', { role: 'style' }],
@@ -471,33 +523,6 @@ function drawMVChart(a,b,c,d,e,f,g,h,key) {
     var chart = new google.visualization.ColumnChart(chartDiv);
     chart.draw(data, options);
   }
-
-function drawFSChart(no, yes, vac, key) {
-        // Create the data table.
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Topping');
-    data.addColumn('number', 'Slices');
-    data.addRows([
-      ['Yes', yes],
-      ['No', no],
-      ['Vacant Household', vac],
-
-    ]);
-
-    // Set chart options
-    var options = {'title':key+': Percentage of Households using Food Stamps',
-                   'width':400,
-                   'height':300};
-
-    // Instantiate and draw our chart, passing in some options.
-    var div = document.getElementById('chart_div');
-    var chartDiv = document.createElement('div');
-    chartDiv.setAttribute("style", "display: inline-block;")
-    div.appendChild(chartDiv);
-    var chart = new google.visualization.PieChart(chartDiv);
-    chart.draw(data, options);
-  }
-
 function drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key){
   var data = new google.visualization.DataTable();
   console.log('here');
@@ -533,6 +558,99 @@ function drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key){
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
+function drawNPChart(){
+  //
+}
+function drawHHTChart(){
+  //
+}
+function drawFPARCChart(){
+  //
+}
+function drawMULTGChart(){
+  //
+}
+function drawHINCPChart(){
+  //
+}
+function drawHHLChart(eng, span, indeu, asian, other, key) {
+    // Create the data table.
+    //console.log('HHL CHART', eng, span, indeu, asian, other, year);
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topping');
+    data.addColumn('number', 'Slices');
+    data.addRows([
+      ['English', eng],
+      ['Spanish', span],
+      ['Indo-European Language', indeu],
+      ['Asian and Pacific Islan Language', asian],
+      ['Other', other],
+
+    ]);
+    var options = {'title':key+': Distribution of Household Languages',
+                   'width':350,
+                   'height':350};
+    var div = document.getElementById('chart_div');
+    var chartDiv = document.createElement('div');
+    chartDiv.setAttribute("style", "display: inline-block;")
+    div.appendChild(chartDiv);
+    var chart = new google.visualization.PieChart(chartDiv);
+    chart.draw(data, options);
+  }
+function drawFSChart(no, yes, vac, key) {
+        // Create the data table.
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topping');
+    data.addColumn('number', 'Slices');
+    data.addRows([
+      ['Yes', yes],
+      ['No', no],
+      ['Vacant Household', vac],
+
+    ]);
+
+    // Set chart options
+    var options = {'title':key+': Percentage of Households using Food Stamps',
+                   'width':400,
+                   'height':300};
+
+    // Instantiate and draw our chart, passing in some options.
+    var div = document.getElementById('chart_div');
+    var chartDiv = document.createElement('div');
+    chartDiv.setAttribute("style", "display: inline-block;")
+    div.appendChild(chartDiv);
+    var chart = new google.visualization.PieChart(chartDiv);
+    chart.draw(data, options);
+  }
+function drawVACSChart(a,b,c,d,e,f,g,h,key) {
+    // TODO NEED A DIFFERENT CHART
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topping');
+    data.addColumn('number', 'Slices');
+    data.addRows([
+      ['For Rent', a],
+      ['Rented (not occupied)', b],
+      ['For Sale', c],
+      ['Sold (not occupies)', d],
+      ['Season Use', e],
+      ['Migratory Workers', f],
+      ['Other', g],
+      ['Occupied', h],
+
+    ]);
+    var options = {'title':key+': Vacancy Status',
+                   'width':350,
+                   'height':350};
+    var div = document.getElementById('chart_div');
+    var chartDiv = document.createElement('div');
+    chartDiv.setAttribute("style", "display: inline-block;")
+    div.appendChild(chartDiv);
+    var chart = new google.visualization.PieChart(chartDiv);
+    chart.draw(data, options);
+  }
+
+
+
 //don't think this is doing anything
 function sendUpdateReq()
 {
