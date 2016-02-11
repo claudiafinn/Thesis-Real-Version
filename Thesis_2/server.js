@@ -22,21 +22,22 @@ function serveDynamic( req, res )
         var data="";
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
 
-        //check for problems in data
-        //male sure no sql bad stuff
-        var sqlString1 = "SELECT * FROM NEIGHBORHOODS WHERE "
+        var sqlString1 = "SELECT * FROM NEIGHBORHOODS WHERE ";
+        var sqlString1List = [];
         if(neighborhood2==" "){
-          sqlString1+="Neighborhood = \""+neighborhood1+'\"';
+          sqlString1+="Neighborhood = ? "
+          sqlString1List.push(neighborhood1);
         }
         else{
-          sqlString1+="(Neighborhood = \""+neighborhood1 +"\" OR Neighborhood = \""+neighborhood2+"\")";
+          sqlString1+="(Neighborhood = ? OR Neighborhood = ?)";
+          sqlString1List.push(neighborhood1);
+          sqlString1List.push(neighborhood2);
         }
         console.log(sqlString1);
-        db.all(sqlString1,
-
+        console.log(sqlString1List);
+        db.all(sqlString1, sqlString1List,
           function( err, rows ) {
             var pumaData = {};
-
             for(var i=0; i<rows.length; i++){
               if (rows[i]['PUMA'] in pumaData){
                 if(rows[i]['Neighborhood'] in pumaData[rows[i]['PUMA']]){
@@ -55,31 +56,39 @@ function serveDynamic( req, res )
             }
 
             //console.log(pumaData);
-            var sqlString2 = "SELECT * FROM House_Data3 WHERE (PUMA =  ";
+            var sqlString2 = "SELECT * FROM House_Data3 WHERE (PUMA =  ?";
+            var sqlString2List =[]
             var first = true;
             for (var key in pumaData){
-              if(first ==  true){sqlString2+=key}
+              if(first ==  true){sqlString2List.push(parseInt(key))}
               else{
-                sqlString2 +=" OR PUMA = "+key;
+                sqlString2 +=" OR PUMA = ?";
+                sqlString2List.push(parseInt(key));
               }
               first = false;
             }
             sqlString2+=" )";
+
             if (year2=="") { var dif = 0;}
             else { var dif = Math.abs(year-year2); }
-            sqlString2+="AND (YEAR = "+year;
+            sqlString2+="AND (YEAR = ?"
+            sqlString2List.push(parseInt(year));
             for(var i=0; i<dif; i++){
               year++;
-              sqlString2+=" OR YEAR = "+year
+              sqlString2+=" OR YEAR = ?"
+              sqlString2List.push(parseInt(year));
             }
             sqlString2+=")";
 
+            console.log(sqlString2);
+            console.log(sqlString2List);
             var dataToSend={};
             for (var key in pumaData){
               dataToSend[key]={};
             }
-            db.all(sqlString2,
+            db.all(sqlString2, sqlString2List,
               function( err, rows ) {
+                console.log(rows.length);
                 if(err){ console.log(err);}
                 for( var i = 0; i < rows.length; i++ )
                 {
@@ -91,25 +100,24 @@ function serveDynamic( req, res )
                     dataToSend[rows[i]['PUMA']][rows[i]['YEAR']].push(rows[i][category]);
                   }
                 }
-              /*  var json = {};
-                json.dataList=dataToSend;
-                json.dataType=category;
-                json.neighborhoods = pumaData;
-*/
-                //build sqlString for retrieving all the population data
-                var sqlString3=" SELECT * FROM Population WHERE (CensusTract = "
+
+                var sqlString3=" SELECT * FROM Population WHERE (CensusTract = ";
+                var sqlString3List=[];
                 for (puma in pumaData){
                   for(neighborhood in pumaData[puma]){
                     for(census in pumaData[puma][neighborhood]){
-                      sqlString3+=census +" OR CensusTract = ";
+                      sqlString3+="? OR CensusTract = ";
+                      sqlString3List.push(census);
                     }
                   }
                 }
                 sqlString3+=" 0 )"
 
                 console.log(sqlString3);
-                db.all(sqlString3,
+                console.log(sqlString3List)
+                db.all(sqlString3, sqlString3List,
                   function( err, rows ) {
+
                     if(err){ console.log(err);}
                     for (var i=0; i<rows.length; i++){
                       for( puma in pumaData){

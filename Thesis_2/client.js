@@ -225,31 +225,90 @@ function onResponse( evt )
   }
 }
 
-//not done
+//TODO need to be fixed for 2006/2007
 function VALP(info, key){
-  //
+  var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0; var j=0; var k=0; var l=0; var m=0; var n=0;
+  var na=0;
+  for(var i=0; i<info.length; i++){
+
+    if(info[i]==1 || info[i]==2 || (info[i]>0 && info[i]<14999)){
+      a++;
+    }
+    else if (info[i]==3 || info[i]==4 || info[i]<24999){
+      b++;
+    }
+    else if (info[i]==5 || info[i]==6 || info[i]<34999){
+      c++;
+    }
+    else if (info[i]==7 || info[i]==8 || info[i]<49999){
+      d++;
+    }
+    else if (info[i]==9 || info[i]==10 || info[i]<69999){
+      e++;
+    }
+    else if (info[i]==11 || info[i]==12 || info[i]<89999){
+      f++;
+    }
+    else if (info[i]==13 || info[i]==14 || info[i]<124999){
+      g++;
+    }
+    else if (info[i]==15 || info[i]==16 || info[i]<174999){
+      h++;
+    }
+    else if (info[i]==17 || info[i]==18 || info[i]<249999){
+      j++;
+    }
+    else if (info[i]==19 || info[i]==20 || info[i]<399999){
+      k++;
+    }
+    else if (info[i]==21 || info[i]==22 || info[i]<749999){
+      l++;
+    }
+    else if (info[i]==23 || info[i]<999999){
+      m++;
+    }
+    else if (info[i]==24 || info[i]>1000000){
+      n++;
+    }
+    else{
+      na++;
+    }
+  }
+  drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key);
 }
 //not done
 function TAXP(info, key){
-  //
+  //range corresponding to dollar amt
 }
-//done
+// not done
 function RNTP(info, key){
-  var totalYes=0;
-  var totalNo=0;
-  var totalVacant=0;
-  for (var i=0; i<info.length; i++){
-    if (info[i]==2){
-      totalNo++;
+  //dollar amount
+  var a=0; var b=0; var c=0; var d=0; var e=0;var f=0; var na=0;
+  for(var i =0; i<info.length; i++){
+    if(info[i]>0 && info[i]<300){
+      a++;
     }
-    else if(info[i]==1){
-      totalYes++;
+    else if( info[i]>0 && info[i]<500){
+      console.log(info[i])
+      b++;
+    }
+    else if(info[i]>0 && info[i]<1000){
+      c++;
+    }
+    else if( info[i]>0 && info[i]<1500){
+      d++;
+    }
+    else if( info[i]>0 && info[i]<2500){
+      e++;
+    }
+    else if(info[i]>0 && info[i]>=2500){
+      f++;
     }
     else{
-      totalVacant++;
+      na++;
     }
   }
-  drawRNTPChart(totalNo, totalYes, totalVacant, key);
+  drawRNTPChart(a,b,c,d,e,f,na, key);
 }
 //done
 function MV(info, key){
@@ -367,41 +426,109 @@ function YBL(info, key){
 }
 //not done
 function NP(info, key){
-  //
+  var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0;
+  for(var i=0; i<info.length; i++){
+    if(info[i]==1){
+      a++
+    }
+    if(info[i]==2){
+      b++
+    }
+    if(info[i]==3){
+      c++
+    }
+    if(info[i]==4){
+      d++
+    }
+    if(info[i]==5){
+      e++
+    }
+    if(info[i]==6){
+      f++
+    }
+    if(info[i]==7){
+      g++
+    }
+    if(info[i]>=8){
+      h++
+    }
+  }
+  drawNPChart(a,b,c,d,e,f,g,h,key);
 }
-//not done
+// done
 function FPARC(info, key){
-  //
+  var under5 =0
+  var over5 = 0;
+  var both =0;
+  var neither=0;
+  var vacant=0;
+  for(var i=0; i<info.length; i++){
+    if(info[i]==1){
+      under5++
+    }
+    else if(info[i]==2){
+      over5++;
+    }
+    else if(info[i]==3){
+      both++;
+    }
+    else if(info[i]==4){
+      neither++;
+    }
+    else{
+      vacant++;
+    }
+  }
+  drawFPARCChart(under5, over5, both, neither, vacant, key);
 }
 //done
 function MULTG(info, key){
-  var totalYes=0;
-  var totalNo=0;
-  var totalVacant=0;
+  var yes=0;
+  var no=0;
+  var vacant=0;
   for (var i=0; i<info.length; i++){
     if (info[i]==1){
-      totalNo++;
+      no++;
     }
     else if(info[i]==2){
-      totalYes++;
+      yes++;
     }
     else{
-      totalVacant++;
+      vacant++;
     }
   }
-  drawMULTGChart(totalNo, totalYes, totalVacant, key);
+  drawMULTGChart(no, yes, vacant, key);
 }
-//not done
-//Prentiss - how to display this info
+//done
 function HINCP(info, key){
+  var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0;
   for (var i=0; i<info.length; i++){
-    if (info[i]<0){
-      //negative income
+    if (info[i]<10,000){
+      a++;
     }
-    else if(info[i]){
-
+    else if(info[i] <35000){
+      b++;
+    }
+    else if(info[i] <75000){
+      c++;
+    }
+    else if(info[i] <150000){
+      d++;
+    }
+    else if(info[i] <250000){
+      e++;
+    }
+    else if(info[i] <400000){
+      f++;
+    }
+    else if(info[i] <650000){
+      g++;
+    }
+    else{
+      h++;
     }
   }
+  drawHINCPChart(a,b,c,d,e,f,g,h,key);
 }
 //done
 function HHL(info, key){
@@ -489,16 +616,124 @@ function VACS(info, key){
   }
   drawVACSChart(a,b,c,d,e,f,g,h,key);
 }
+function HHT(info, key){
+  var marriedCouple=0;
+  var maleHouse=0;
+  var femaleHouse=0;
+  var maleAlone =0;
+  var maleNotAlone=0;
+  var femaleAlone=0;
+  var femaleNotAlone=0;
+  var vacant=0;
+  for(var i=0; i<info.length; i++){
+    if(info[i]==1){
+      marriedCouple++;
+    }
+    else if(info[i]==2){
+      maleHouse++;
+    }
+    else if(info[i]==3){
+      femaleHouse++;
+    }
+    else if(info[i]==4){
+      maleAlone++;
+    }
+    else if(info[i]==5){
+      maleNotAlone++;
+    }
+    else if(info[i]==6){
+      femaleAlone++;
+    }
+    else if(info[i]==7){
+      femaleNotAlone++;
+    }
+    else{
+      console.log("here" , info[i]);
+      vacant++;
+    }
+  }
+  drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotAlone, femaleAlone, femaleNotAlone, vacant, key);
+}
+function WORKSTAT(info, key){
+  var bothEmployed=0;
+  var oneEmployed=0;
+  var bothUnemployed=0;
+  var singleEmployed=0;
+  var singleUnemployed=0;
+  for(var i=0; i<info.length; i++){
+    if(info[i]==1){
+      bothEmployed++;
+    }
+    if(info[i]==2 || info[i]==4){
+      oneEmployed++;
+    }
+    if(info[i]==5){
+      bothUnemployed++;
+    }
+    if(info[i]==10 || info[i]==13){
+      singleEmployed++;
+    }
+    if(info[i]==11 || info[i]==14){
+      singleUnemployed++;
+    }
+  }
+  drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmployed, singleUnemployed, key);
+}
 
+function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key){
+  var data = new google.visualization.arrayToDataTable([
+       ['Time', 'value', { role: 'style' }],
+       ['<$14,999', a, '#b87333'],            // RGB value
+       ['$15,000-$24,999', b, 'purple'],
+       ['$25,000-$34,999', c, 'green'],
+       ['$35,000-$49,999', d, 'blue'],
+       ['$50,000-$69,999', e, 'yellow'],
+       ['$70,000-$89,999', f, 'red'],
+       ['$90,000-$124,999', g, 'black'],
+       ['$125,000-$174,999', h, 'gold'],
+       ['$175,000-$249,999', j, 'yellow'],
+       ['$250,000-$399,999', k, 'green'],
+       ['$400,000-$749,999', l, 'blue'],
+       ['$750,000-$1,000,000', m, 'grey'],
+       ['$1,000,000+', n, 'green'],
 
-function drawVALPChart(){
-  //
+    ]);
+
+  var options = {'title':key+': Year Moved into Properties',
+                 'width':350,
+                 'height':350};
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.ColumnChart(chartDiv);
+  chart.draw(data, options);
 }
 function drawTAXPChart(){
   //
 }
-function drawRNTPChart(){
-  //
+function drawRNTPChart(a,b,c,d,e,f,na,key){
+  var data = new google.visualization.arrayToDataTable([
+       ['Time', 'value', { role: 'style' }],
+       ['$0-$299', a, '#b87333'],            // RGB value
+       ['$300-$499', b, 'purple'],
+       ['$500-$999', c, 'green'],
+       ['$1,000-$1,499', d, 'blue'],
+       ['$1,500-$2,500', e, 'yellow'],
+       ['$2,500+', f, 'red'],
+       ['Not for Rent', na, 'black'],
+
+    ]);
+
+  var options = {'title':key+': Monthly Rent',
+                 'width':350,
+                 'height':350};
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.ColumnChart(chartDiv);
+  chart.draw(data, options);
 }
 function drawMVChart(a,b,c,d,e,f,g,h,key) {
     var data = new google.visualization.arrayToDataTable([
@@ -558,24 +793,126 @@ function drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key){
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
-function drawNPChart(){
-  //
+function drawNPChart(a,b,c,d,e,f,g,h,key){
+  var data = new google.visualization.arrayToDataTable([
+       ['Time', 'value', { role: 'style' }],
+       ['1', a, '#b87333'],            // RGB value
+       ['2', b, 'purple'],
+       ['3', c, 'green'],
+       ['4', d, 'blue'],
+       ['5', e, 'yellow'],
+       ['6', f, 'red'],
+       ['7', g, 'black'],
+       ['8+', h, 'gold'],
+    ]);
+
+  var options = {'title':key+': Year Moved into Properties',
+                 'width':350,
+                 'height':350};
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
+  chart.draw(data, options);
 }
-function drawHHTChart(){
-  //
+function drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotAlone, femaleAlone, femaleNotAlone, vacant, key){
+  var data = new google.visualization.arrayToDataTable([
+       ['Time', 'value', { role: 'style' }],
+       ['Married Couple Household', marriedCouple, '#b87333'],            // RGB value
+       ['Male Family Household (No Wife Present)', maleHouse, 'purple'],
+       ['Female Family Household(No Husband Present)', femaleHouse, 'green'],
+       ['Male Householder, Living ALone', maleAlone, 'blue'],
+       ['Male Householder, Not Living Alone', maleNotAlone, 'yellow'],
+       ['Female Householder, Living Alone', femaleAlone, 'red'],
+       ['Female Householder, Not Living Alone', femaleNotAlone, 'black'],
+       ['Vacant', vacant, 'gold'],
+    ]);
+
+  var options = {'title':key+': Year Moved into Properties',
+                 'width':350,
+                 'height':350};
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.ColumnChart(chartDiv);
+  chart.draw(data, options);
 }
-function drawFPARCChart(){
-  //
+function drawFPARCChart(under5, over5, both, neither, vacant, key){
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Topping');
+  data.addColumn('number', 'Slices');
+  data.addRows([
+    ['Children present under 5', under5],
+    ['Children present between 5 and 17', over5],
+    ['Children present both under 5 and between 5 and 17', both],
+    ['No related hildren', neither],
+    ['Not a Family/Vacant', vacant],
+
+  ]);
+
+  // Set chart options
+  var options = {'title':key+': Distribution of Households with Children',
+                 'width':400,
+                 'height':300};
+
+  // Instantiate and draw our chart, passing in some options.
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
+  chart.draw(data, options);
 }
-function drawMULTGChart(){
-  //
+function drawMULTGChart(no, yes, vacant, key){
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Topping');
+  data.addColumn('number', 'Slices');
+  data.addRows([
+    ['Yes', yes],
+    ['No', no],
+    ['Vacant Household', vacant],
+
+  ]);
+
+  // Set chart options
+  var options = {'title':key+': Multigenerational Households',
+                 'width':400,
+                 'height':300};
+
+  // Instantiate and draw our chart, passing in some options.
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
+  chart.draw(data, options);
 }
-function drawHINCPChart(){
-  //
+function drawHINCPChart(a,b,c,d,e,f,g,h,key){
+  var data = new google.visualization.arrayToDataTable([
+       ['Time', 'value', { role: 'style' }],
+       ['<$10,000', a, '#b87333'],            // RGB value
+       ['$10,000-$34,999', b, 'purple'],
+       ['$35,000-$74,999', c, 'green'],
+       ['$75,000-$149,999', d, 'blue'],
+       ['$150,000-$249,999', e, 'yellow'],
+       ['$250,000-$399,999', f, 'red'],
+       ['$400,000-$649,999', g, 'black'],
+       ['>$650,000', h, 'gold'],
+    ]);
+
+  var options = {'title':key+': Year Moved into Properties',
+                 'width':350,
+                 'height':350};
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
+  chart.draw(data, options);
 }
 function drawHHLChart(eng, span, indeu, asian, other, key) {
-    // Create the data table.
-    //console.log('HHL CHART', eng, span, indeu, asian, other, year);
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Topping');
     data.addColumn('number', 'Slices');
@@ -645,11 +982,32 @@ function drawVACSChart(a,b,c,d,e,f,g,h,key) {
     var chartDiv = document.createElement('div');
     chartDiv.setAttribute("style", "display: inline-block;")
     div.appendChild(chartDiv);
-    var chart = new google.visualization.PieChart(chartDiv);
+    var chart = new google.visualization.ColumnChart(chartDiv);
     chart.draw(data, options);
   }
 
+function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmployed, singleUnemployed, key){
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'Topping');
+  data.addColumn('Percentage', 'percentage');
+  data.addRows([
+    ['Husband and Wife Employed', bothEmployed],
+    ['Either Husband or Wife Employed', oneEmployed],
+    ['Both Husband or Wife Unemployed', bothUnemployed],
+    ['Single Household, Employed', singleEmployed],
+    ['Single Household, Unemployed', singleUnemployed],
 
+  ]);
+  var options = {'title':key+': Employment',
+                 'width':350,
+                 'height':350};
+  var div = document.getElementById('chart_div');
+  var chartDiv = document.createElement('div');
+  chartDiv.setAttribute("style", "display: inline-block;")
+  div.appendChild(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
+  chart.draw(data, options);
+}
 
 //don't think this is doing anything
 function sendUpdateReq()
@@ -691,6 +1049,7 @@ function addNeighborhood(){
   var button2 = document.getElementById( 'add_year' );
   div.removeChild(button2);
 }
+
 function addYear(){
   var div = document.getElementById( 'year_container' );
   var button = document.getElementById( 'add_year' );
