@@ -24,7 +24,7 @@ catch( exp ){
 //**Start real shit
 //
 //**
-var categories = ["YEAR", "PUMA", "SERIALNO","ADJUST", "ADJINC", "NP", "FS","RNTP","VACS","VAL","YBL","FINCP","FPARC", "HHL","HHT", "HINCP","MV","MULTG","TAXP","WORKSTAT"];//etc
+var categories = ["YEAR", "PUMA", "SERIALNO","ADJUST", "ADJINC", "NP", "FS","RNTP","VACS","VALP","YBL","FINCP","FPARC", "HHL","HHT", "HINCP","MV","MULTG","TAXP","WORKSTAT"];//etc
 //var pumas = ["812","813"];//etc
 
 var contents = fileBuffer.toString();
@@ -61,7 +61,6 @@ for (var k=0; k<categories.length; k++){
     if (documentCats[m] == categories[k]){
       if(categories[k]=="YBL"){ybl = m; console.log(categories[k], m);}
       if(categories[k]=="FS"){fs = m; console.log(categories[k], m);}
-      //indexes.push(m);
       indexes[k]=m;
 
     }
@@ -78,7 +77,7 @@ for( var i = 1; i < contents_lines.length-1; i++ )
   //retrieve the data fro the proper index
   for ( var j = 1; j <indexes.length; j++){
     //data to be preprocessed for 2008,2007,2006
-    if(indexes[j]==ybl){
+  /*  if(indexes[j]==ybl){
       console.log('here', j, vals[indexes[j]]);
       if(vals[indexes[j]]==01){input=input+12+",";   }
       else if(vals[indexes[j]]==02){input=input+11+",";  }
@@ -92,18 +91,18 @@ for( var i = 1; i < contents_lines.length-1; i++ )
       else if(vals[indexes[j]]==10){input=input+03+",";  }
       else if(vals[indexes[j]]==11){input=input+02+","; }
       else if(vals[indexes[j]]==12){input=input+01+","; }
-    }
-    else if(indexes[j]==fs){
+    }*/
+  /*  else if(indexes[j]==fs){
       if(vals[indexes[j]]==""){input=input+"NULL,";}
       else if(vals[indexes[j]]>0){input = input+01+","; }
       else if (vals[indexes[j]]==0){input=input+02+","; }
-    }
-    else{
+    }*/
+    //else{
       var data = vals[indexes[j]];
       if(data==undefined){
         data="NULL"
       }
-      if (data==""){
+      if (data=="" || data==" "){
         data="NULL"
       }
       if (j==indexes.length-1){
@@ -112,7 +111,7 @@ for( var i = 1; i < contents_lines.length-1; i++ )
       else{
         input+=data+",";
       }
-    }
+    //}
   }
 
 input+=")";

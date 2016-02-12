@@ -33,8 +33,6 @@ function serveDynamic( req, res )
           sqlString1List.push(neighborhood1);
           sqlString1List.push(neighborhood2);
         }
-        console.log(sqlString1);
-        console.log(sqlString1List);
         db.all(sqlString1, sqlString1List,
           function( err, rows ) {
             var pumaData = {};
@@ -55,7 +53,6 @@ function serveDynamic( req, res )
               }
             }
 
-            //console.log(pumaData);
             var sqlString2 = "SELECT * FROM House_Data3 WHERE (PUMA =  ?";
             var sqlString2List =[]
             var first = true;
@@ -79,16 +76,12 @@ function serveDynamic( req, res )
               sqlString2List.push(parseInt(year));
             }
             sqlString2+=")";
-
-            console.log(sqlString2);
-            console.log(sqlString2List);
             var dataToSend={};
             for (var key in pumaData){
               dataToSend[key]={};
             }
             db.all(sqlString2, sqlString2List,
               function( err, rows ) {
-                console.log(rows.length);
                 if(err){ console.log(err);}
                 for( var i = 0; i < rows.length; i++ )
                 {
@@ -112,9 +105,6 @@ function serveDynamic( req, res )
                   }
                 }
                 sqlString3+=" 0 )"
-
-                console.log(sqlString3);
-                console.log(sqlString3List)
                 db.all(sqlString3, sqlString3List,
                   function( err, rows ) {
 
@@ -123,7 +113,6 @@ function serveDynamic( req, res )
                       for( puma in pumaData){
                         for (neighborhood in pumaData[puma]){
                           for (census in pumaData[puma][neighborhood]){
-                            console.log ("HERE", census, rows[i]['CensusTract'])
                             if (rows[i]['CensusTract'] == census){
                               pumaData[puma][neighborhood][census]["Population"] = rows[i]['Population2010'];
                               pumaData[puma][neighborhood][census]["Population2000"] = rows[i]['Population2000'];
@@ -134,7 +123,6 @@ function serveDynamic( req, res )
                         }
                       }
                     }
-                    console.log("puma",pumaData);
                     var json = {};
                     json.dataList=dataToSend;
                     json.dataType=category;
@@ -145,75 +133,6 @@ function serveDynamic( req, res )
                 });
             });
         });
-
-        //TODO
-        //maybe won't do multiple categores
-        /*else if(category2 !=""){
-          db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ? ", [ puma ],
-            function( err, rows ) {
-              puma=rows[0].PUMA;
-              console.log("double cat", puma, year, category, category2);
-              db.all( "SELECT * FROM House_Data3 WHERE PUMA = "+puma+"  AND YEAR = "+year,
-                function( err, rows ) {
-                  if(err){ console.log(err);}
-                  var dataToSend={};
-                  console.log(rows.length, category, category2);
-                  for( var i = 0; i < rows.length; i++ )
-                  {
-                    if( !(category in dataToSend) && !(category2 in dataToSend))
-                    {
-                      dataToSend[category] = [];
-                      dataToSend[category2] =[];
-                    }
-                    dataToSend[category].push(rows[i][category]);
-                    dataToSend[category2].push(rows[i][category2] );
-                  }
-                  var json = {};
-                  json.dataList=dataToSend;
-                  json.dataType=category;
-                  res.writeHead( 200 );
-                  res.end(JSON.stringify(json));
-                }
-              );
-          }
-        );
-      }*/
-
-        //multiple nieghborhoods
-      /*  else if( puma2 !=""){
-          db.all("SELECT PUMA FROM NEIGHBORHOODS WHERE Neighborhood = ? OR Neighborhood = ?", [ puma, puma2 ],
-            function( err, rows ) {
-              puma=rows[0].PUMA;
-              puma2=rows[1].PUMA;
-              var tracts=[];
-              for(var i=0; i<rows.length; i++){
-                tracts.push(rows[i]['CensusTract']);
-                console.log(rows[i]['CensusTract']);
-              }
-              console.log(puma, puma2)
-              console.log("double puma");
-              db.all( "SELECT * FROM House_Data3 WHERE (PUMA = ? OR PUMA = ?) AND YEAR = ?",[puma, puma2, year],
-                function( err, rows ) {
-                  if(err){ console.log(err);}
-                  var dataToSend={};
-                  for( var i = 0; i < rows.length; i++ )
-                  {
-                    if( !(rows[i]['PUMA'] in dataToSend))
-                    {
-                      dataToSend[rows[i]['PUMA']] = [ rows[i][category] ];
-                    }
-                    else {
-                      dataToSend[rows[i]['PUMA']].push(rows[i][category]);
-                    }
-                  }
-                  var json = {};
-                  json.dataList=dataToSend;
-                  json.dataType=category;
-                  res.writeHead( 200 );
-                  res.end(JSON.stringify(json));
-              });
-          });
-        }*/
     }
 
     else if( req.url.indexOf( "load?" ) >= 0 )

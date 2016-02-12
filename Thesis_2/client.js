@@ -1,6 +1,6 @@
 
 //var oneYear = true;
-var years =["2006","2007", "2008", "2009", "2010", "2011", "2012", "2013"];
+var years =["2006","2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014"];
 var categories = [ {"Value": "VACS", "Display":"Vacancy Status"},{"Value": "FS", "Display":"Food Stamp"},
                 {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"},
                 {"Value": "MV", "Display":"Years Lived"},{"Value": "YBL", "Display":"Year Built"},
@@ -135,13 +135,6 @@ function getResults(){
   xhr.send();
 }
 
-/*function doMapStuff(neighborhood){
-   var map = document.getElementById('map');
-   map.data.setStyle(function(feature){
-     var name = feature.getProperty('name');
-     console.log(name);
-   });
-}*/
 
 function onResponse( evt )
 {
@@ -162,8 +155,6 @@ function onResponse( evt )
         population+=jsonData.neighborhoods[puma][neighborhood][census]["Population"];
         population2000+=jsonData.neighborhoods[puma][neighborhood][census]["Population2000"];
       }
-      console.log("pop", population)
-
     }
     text.innerHTML += puma+"Population 2010 : " +population + " Population 2000 : " +population2000;
   }
@@ -212,9 +203,11 @@ function onResponse( evt )
         HHL(jsonData.dataList[puma][year], puma );
       }
       if (jsonData.dataType=="FS"){
-        FS(jsonData.dataList[puma][year], puma );;
+        FS(jsonData.dataList[puma][year], puma );
       }
-
+      if(jsonData.dataType=="VACS"){
+        VACS(jsonData.dataList[puma][year], puma );
+      }
       if (jsonData.dataType=="FINCP"){
         FINCP(jsonData.dataList[puma][year], puma );;
       }
@@ -1008,19 +1001,6 @@ function sendUpdateReq()
 }
 
 
-/*function addCategory(){
-  var div = document.getElementById( 'category_container' );
-  var button = document.getElementById( 'add_category' );
-  var new_select=document.createElement('select');
-  new_select.className="form-control";
-  new_select.id="category_select2";
-  for(var i=0; i<categories.length; i++){
-    new_select.options.add( new Option(categories[i].Display, categories[i].Value) );
-  }
-  div.appendChild(new_select);
-  div.removeChild(button);
-}*/
-
 function addNeighborhood(){
   var div = document.getElementById( 'puma_container' );
   var button = document.getElementById( 'add_puma' );
@@ -1035,7 +1015,7 @@ function addNeighborhood(){
 
   var div2 = document.getElementById( 'year_container' );
   var button2 = document.getElementById( 'add_year' );
-  div.removeChild(button2);
+  div2.removeChild(button2);
 }
 
 function addYear(){
