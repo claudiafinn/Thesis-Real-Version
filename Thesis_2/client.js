@@ -225,7 +225,7 @@ function onResponse( evt )
   }
 }
 
-//TODO need to be fixed for 2006/2007
+
 function VALP(info, key){
   var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0; var j=0; var k=0; var l=0; var m=0; var n=0;
   var na=0;
@@ -276,11 +276,9 @@ function VALP(info, key){
   }
   drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key);
 }
-//not done
 function TAXP(info, key){
   //range corresponding to dollar amt
 }
-// not done
 function RNTP(info, key){
   //dollar amount
   var a=0; var b=0; var c=0; var d=0; var e=0;var f=0; var na=0;
@@ -308,9 +306,9 @@ function RNTP(info, key){
       na++;
     }
   }
-  drawRNTPChart(a,b,c,d,e,f,na, key);
+  var percentForRent = 100 - (na/(a+b+c+d+e+f+na));
+  drawRNTPChart(a,b,c,d,e,f,percentForRent, key);
 }
-//done
 function MV(info, key){
   var a=0;
   var b=0;
@@ -349,7 +347,6 @@ function MV(info, key){
   }
   drawMVChart(a,b,c,d,e,f,g,h,key);
 }
-//done
 function YBL(info, key){
   var a=0;
   var b=0;
@@ -424,7 +421,6 @@ function YBL(info, key){
   }
   drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key);
 }
-//not done
 function NP(info, key){
   var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0;
   for(var i=0; i<info.length; i++){
@@ -455,7 +451,6 @@ function NP(info, key){
   }
   drawNPChart(a,b,c,d,e,f,g,h,key);
 }
-// done
 function FPARC(info, key){
   var under5 =0
   var over5 = 0;
@@ -481,7 +476,6 @@ function FPARC(info, key){
   }
   drawFPARCChart(under5, over5, both, neither, vacant, key);
 }
-//done
 function MULTG(info, key){
   var yes=0;
   var no=0;
@@ -499,7 +493,6 @@ function MULTG(info, key){
   }
   drawMULTGChart(no, yes, vacant, key);
 }
-//done
 function HINCP(info, key){
   var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0;
   for (var i=0; i<info.length; i++){
@@ -530,7 +523,6 @@ function HINCP(info, key){
   }
   drawHINCPChart(a,b,c,d,e,f,g,h,key);
 }
-//done
 function HHL(info, key){
     var english =0;
     var spanish=0;
@@ -557,7 +549,6 @@ function HHL(info, key){
     drawHHLChart(english,spanish,indeu,asian,other, key);
 
 }
-//done
 function FS(info, key){
   var totalYes=0;
   var totalNo=0;
@@ -575,7 +566,6 @@ function FS(info, key){
   }
   drawFSChart(totalNo, totalYes, totalVacant, key);
 }
-//done
 function VACS(info, key){
   console.log('vacs')
 
@@ -614,7 +604,8 @@ function VACS(info, key){
 
     }
   }
-  drawVACSChart(a,b,c,d,e,f,g,h,key);
+  var percentVacant=100 - ((h)/(a+b+c+d+e+f+g+h));
+  drawVACSChart(a,b,c,d,e,f,g,percentVacant,key);
 }
 function HHT(info, key){
   var marriedCouple=0;
@@ -721,11 +712,11 @@ function drawRNTPChart(a,b,c,d,e,f,na,key){
        ['$1,000-$1,499', d, 'blue'],
        ['$1,500-$2,500', e, 'yellow'],
        ['$2,500+', f, 'red'],
-       ['Not for Rent', na, 'black'],
+      // ['Not for Rent', na, 'black'],
 
     ]);
 
-  var options = {'title':key+': Monthly Rent',
+  var options = {'title':key+ '%'+na+': Monthly Rent',
                  'width':350,
                  'height':350};
   var div = document.getElementById('chart_div');
@@ -962,8 +953,8 @@ function drawFSChart(no, yes, vac, key) {
 function drawVACSChart(a,b,c,d,e,f,g,h,key) {
     // TODO NEED A DIFFERENT CHART
     var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Topping');
-    data.addColumn('number', 'Slices');
+    data.addColumn('string', 'Reason');
+    data.addColumn('number', 'Percentage');
     data.addRows([
       ['For Rent', a],
       ['Rented (not occupied)', b],
@@ -972,10 +963,10 @@ function drawVACSChart(a,b,c,d,e,f,g,h,key) {
       ['Season Use', e],
       ['Migratory Workers', f],
       ['Other', g],
-      ['Occupied', h],
+      //['Occupied', h],
 
     ]);
-    var options = {'title':key+': Vacancy Status',
+    var options = {'title':key+': % Vacant = '+h,
                    'width':350,
                    'height':350};
     var div = document.getElementById('chart_div');
@@ -985,11 +976,10 @@ function drawVACSChart(a,b,c,d,e,f,g,h,key) {
     var chart = new google.visualization.ColumnChart(chartDiv);
     chart.draw(data, options);
   }
-
 function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmployed, singleUnemployed, key){
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Topping');
-  data.addColumn('Percentage', 'percentage');
+  data.addColumn('number', 'percentage');
   data.addRows([
     ['Husband and Wife Employed', bothEmployed],
     ['Either Husband or Wife Employed', oneEmployed],
