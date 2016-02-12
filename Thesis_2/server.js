@@ -134,7 +134,7 @@ function serveDynamic( req, res )
                         }
                       }
                     }
-                    console.log(pumaData);
+                    console.log("puma",pumaData);
                     var json = {};
                     json.dataList=dataToSend;
                     json.dataType=category;
@@ -220,7 +220,7 @@ function serveDynamic( req, res )
     {
       var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
       var pumas =[]
-      db.all( "SELECT NEIGHBORHOOD FROM NEIGHBORHOODS",
+      db.all( "SELECT DISTINCT NEIGHBORHOOD FROM NEIGHBORHOODS",
           function( err, rows ) {
               if(err){ console.log(err);}
               for( var i = 0; i < rows.length; i++ )

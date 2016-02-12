@@ -153,21 +153,19 @@ function onResponse( evt )
   var jsonData=JSON.parse(evt.target.responseText);
 
   var text = document.getElementById('testText');
+  text.innerHTML="";
   for(var puma in jsonData.neighborhoods){
     for (var neighborhood in jsonData.neighborhoods[puma]){
-      //var name = map.data.getProperty('name');
-      //console.log(name);
-      //doMapStuff(neighborhood);
       var population =0;
       var population2000=0;
       for (census in jsonData.neighborhoods[puma][neighborhood]){
         population+=jsonData.neighborhoods[puma][neighborhood][census]["Population"];
         population2000+=jsonData.neighborhoods[puma][neighborhood][census]["Population2000"];
-        //console.log(census, jsonData.neighborhoods[puma][neighborhood][census]["Population"])
       }
-      //console.log("pop", population)
-      text.innerHTML = "Population 2010 : " +population + " Population 2000 : " +population2000;
+      console.log("pop", population)
+
     }
+    text.innerHTML += puma+"Population 2010 : " +population + " Population 2000 : " +population2000;
   }
 
   for (var puma in jsonData.dataList){
@@ -191,7 +189,7 @@ function onResponse( evt )
         NP(jsonData.dataList[puma][year], puma );;
       }
       if (jsonData.dataType=="HHT"){
-        HHT(jsonData.dataList[puma][year], puma );;
+        HHT(jsonData.dataList[puma][year], puma );
       }
       if (jsonData.dataType=="FPARC"){
         FPARC(jsonData.dataList[puma][year], puma );;
@@ -200,7 +198,12 @@ function onResponse( evt )
         WORKSTAT(jsonData.dataList[puma][year], puma );;
       }
       if (jsonData.dataType=="MULTG"){
-        MULTG(jsonData.dataList[puma][year], puma );;
+        if(year==2006 || year==2007 ){
+          console.log('doenst exist')
+        }
+        else{
+          MULTG(jsonData.dataList[puma][year], puma );
+        }
       }
       if (jsonData.dataType=="HINCP"){
         HINCP(jsonData.dataList[puma][year], puma );;
@@ -211,12 +214,7 @@ function onResponse( evt )
       if (jsonData.dataType=="FS"){
         FS(jsonData.dataList[puma][year], puma );;
       }
-      if (jsonData.dataType=="VACS"){
-        VACS(jsonData.dataList[puma][year], puma );;
-      }
-      if (jsonData.dataType=="VALP"){
-        VALP(jsonData.dataList[puma][year], puma );;
-      }
+
       if (jsonData.dataType=="FINCP"){
         FINCP(jsonData.dataList[puma][year], puma );;
       }
@@ -231,43 +229,43 @@ function VALP(info, key){
   var na=0;
   for(var i=0; i<info.length; i++){
 
-    if(info[i]==1 || info[i]==2 || (info[i]>0 && info[i]<14999)){
+    if(info[i]==1 || info[i]==2 || (info[i]>25 && info[i]<14999)){
       a++;
     }
-    else if (info[i]==3 || info[i]==4 || info[i]<24999){
+    else if (info[i]==3 || info[i]==4 || (info[i]>25 && info[i]<24999)){
       b++;
     }
-    else if (info[i]==5 || info[i]==6 || info[i]<34999){
+    else if (info[i]==5 || info[i]==6 || (info[i]>25 &&info[i]<34999)){
       c++;
     }
-    else if (info[i]==7 || info[i]==8 || info[i]<49999){
+    else if (info[i]==7 || info[i]==8 || (info[i]>25 &&info[i]<49999)){
       d++;
     }
-    else if (info[i]==9 || info[i]==10 || info[i]<69999){
+    else if (info[i]==9 || info[i]==10 || (info[i]>25 &&info[i]<69999)){
       e++;
     }
-    else if (info[i]==11 || info[i]==12 || info[i]<89999){
+    else if (info[i]==11 || info[i]==12 || (info[i]>25 &&info[i]<89999)){
       f++;
     }
-    else if (info[i]==13 || info[i]==14 || info[i]<124999){
+    else if (info[i]==13 || info[i]==14 || (info[i]>25 &&info[i]<124999)){
       g++;
     }
-    else if (info[i]==15 || info[i]==16 || info[i]<174999){
+    else if (info[i]==15 || info[i]==16 || (info[i]>25 &&info[i]<174999)){
       h++;
     }
-    else if (info[i]==17 || info[i]==18 || info[i]<249999){
+    else if (info[i]==17 || info[i]==18 || (info[i]>25 &&info[i]<249999)){
       j++;
     }
-    else if (info[i]==19 || info[i]==20 || info[i]<399999){
+    else if (info[i]==19 || info[i]==20 || (info[i]>25 &&info[i]<399999)){
       k++;
     }
-    else if (info[i]==21 || info[i]==22 || info[i]<749999){
+    else if (info[i]==21 || info[i]==22 || (info[i]>25 &&info[i]<749999)){
       l++;
     }
-    else if (info[i]==23 || info[i]<999999){
+    else if (info[i]==23 || (info[i]>25 &&info[i]<999999)){
       m++;
     }
-    else if (info[i]==24 || info[i]>1000000){
+    else if (info[i]==24 || (info[i]>25 &&info[i]>1000000)){
       n++;
     }
     else{
@@ -356,7 +354,7 @@ function YBL(info, key){
   var f=0;
   var g=0;
   var h=0;
-  var i=0;
+  var x=0;
   var j=0;
   var k=0;
   var l=0;
@@ -392,7 +390,7 @@ function YBL(info, key){
       j++;
     }
     if (info[i]==9){
-      i++;
+      x++;
     }
     if (info[i]==10){
       h++;
@@ -419,7 +417,7 @@ function YBL(info, key){
       a++;
     }
   }
-  drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key);
+  drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,key);
 }
 function NP(info, key){
   var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0;
@@ -639,7 +637,6 @@ function HHT(info, key){
       femaleNotAlone++;
     }
     else{
-      console.log("here" , info[i]);
       vacant++;
     }
   }
@@ -674,30 +671,32 @@ function WORKSTAT(info, key){
 function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key){
   var data = new google.visualization.arrayToDataTable([
        ['Time', 'value', { role: 'style' }],
-       ['<$14,999', a, '#b87333'],            // RGB value
-       ['$15,000-$24,999', b, 'purple'],
-       ['$25,000-$34,999', c, 'green'],
-       ['$35,000-$49,999', d, 'blue'],
-       ['$50,000-$69,999', e, 'yellow'],
-       ['$70,000-$89,999', f, 'red'],
-       ['$90,000-$124,999', g, 'black'],
-       ['$125,000-$174,999', h, 'gold'],
-       ['$175,000-$249,999', j, 'yellow'],
-       ['$250,000-$399,999', k, 'green'],
-       ['$400,000-$749,999', l, 'blue'],
-       ['$750,000-$1,000,000', m, 'grey'],
-       ['$1,000,000+', n, 'green'],
+       ['<$14,999', a, '#94DFF7'],            // RGB value
+       ['$15,000-$24,999', b, '#68C4E3'],
+       ['$25,000-$34,999', c, '#1A27DB'],
+       ['$35,000-$49,999', d, '#711ADB'],
+       ['$50,000-$69,999', e, '#AA28EB'],
+       ['$70,000-$89,999', f, '#DA28EB'],
+       ['$90,000-$124,999', g, '#EB28A6'],
+       ['$125,000-$174,999', h, '#EB283F'],
+       ['$175,000-$249,999', j, '#F2780C'],
+       ['$250,000-$399,999', k, '#F2AD0C'],
+       ['$400,000-$749,999', l, '#F2EE0C'],
+       ['$750,000-$1,000,000', m, '#9EF20C'],
+       ['$1,000,000+', n, '#0CF210'],
 
     ]);
 
   var options = {'title':key+': Year Moved into Properties',
                  'width':350,
-                 'height':350};
+                 'height':350,
+                 colors: ['#ACADE8', '#8182E6', '#6668E8', '#2327DE', '#A023DE', '#D523DE', '#DE23A3', '#DE2384', '#DE2346', '#FC0313', '#FC2C03', '#FCF803']
+                 };
   var div = document.getElementById('chart_div');
   var chartDiv = document.createElement('div');
   chartDiv.setAttribute("style", "display: inline-block;")
   div.appendChild(chartDiv);
-  var chart = new google.visualization.ColumnChart(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
 function drawTAXPChart(){
@@ -706,8 +705,8 @@ function drawTAXPChart(){
 function drawRNTPChart(a,b,c,d,e,f,na,key){
   var data = new google.visualization.arrayToDataTable([
        ['Time', 'value', { role: 'style' }],
-       ['$0-$299', a, '#b87333'],            // RGB value
-       ['$300-$499', b, 'purple'],
+       ['$0-$299', a, '#94DFF7'],            // RGB value
+       ['$300-$499', b, '#68C4E3'],
        ['$500-$999', c, 'green'],
        ['$1,000-$1,499', d, 'blue'],
        ['$1,500-$2,500', e, 'yellow'],
@@ -723,7 +722,7 @@ function drawRNTPChart(a,b,c,d,e,f,na,key){
   var chartDiv = document.createElement('div');
   chartDiv.setAttribute("style", "display: inline-block;")
   div.appendChild(chartDiv);
-  var chart = new google.visualization.ColumnChart(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
 function drawMVChart(a,b,c,d,e,f,g,h,key) {
@@ -749,9 +748,8 @@ function drawMVChart(a,b,c,d,e,f,g,h,key) {
     var chart = new google.visualization.ColumnChart(chartDiv);
     chart.draw(data, options);
   }
-function drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key){
+function drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,key){
   var data = new google.visualization.DataTable();
-  console.log('here');
   data.addColumn('string', 'Topping');
   data.addColumn('number', 'Slices');
   data.addRows([
@@ -763,7 +761,7 @@ function drawYBLChart(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,key){
     ['2008', f],
     ['2007', g],
     ['2006', h],
-    ['2005', i],
+    ['2005', x],
     ['2000-2004', j],
     ['1990-1999', k],
     ['1980-1989', l],
@@ -827,7 +825,7 @@ function drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotA
   var chartDiv = document.createElement('div');
   chartDiv.setAttribute("style", "display: inline-block;")
   div.appendChild(chartDiv);
-  var chart = new google.visualization.ColumnChart(chartDiv);
+  var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
 function drawFPARCChart(under5, over5, both, neither, vacant, key){
@@ -973,7 +971,7 @@ function drawVACSChart(a,b,c,d,e,f,g,h,key) {
     var chartDiv = document.createElement('div');
     chartDiv.setAttribute("style", "display: inline-block;")
     div.appendChild(chartDiv);
-    var chart = new google.visualization.ColumnChart(chartDiv);
+    var chart = new google.visualization.PieChart(chartDiv);
     chart.draw(data, options);
   }
 function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmployed, singleUnemployed, key){
