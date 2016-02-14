@@ -31,6 +31,7 @@ function initialize() {
       zoom: minZoomLevel,
       center:{lat: 39.737760, lng: -105.000755},
   });
+  var markers=[];
 
   map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
 
@@ -76,11 +77,27 @@ function initialize() {
     map.data.overrideStyle(event.feature, {strokeWeight: 6, fillOpacity : 0});
   });
 
+  var infowindow = new google.maps.InfoWindow();
+
   map.data.addListener('click', function(event) {
+    for(var i = 0; i < markers.length; i++){
+       markers[i].setMap(null);
+    }
+    markers=[];
+    var marker = new google.maps.Marker({position: event.latLng, map: map});
+    markers.push(marker)
     var name  = event.feature.getProperty('name');
+    infowindow.close();
+    infowindow.setContent(name);
     console.log(name);
+  //  for (var i = 0; i < markers.length; i++) {
+  //      markers[i].setMap(map);
+  //      infowindow.open(map, marker);
+  //    }
+    infowindow.open(map, marker);
     map.data.revertStyle();
-    map.data.overrideStyle(event.feature, {strokeWeight: 6, fillOpacity : 7});
+    map.data.overrideStyle(event.feature, {strokeWeight: 6, fillOpacity : 0});
+
   });
 }
 
@@ -681,8 +698,9 @@ function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key){
     ]);
 
   var options = {'title':key+': Year Moved into Properties',
-                 'width':350,
-                 'height':350,
+                'width':350,
+                'height':300,
+               'chartArea': {width: '80%'},
                  colors: ['#ACADE8', '#8182E6', '#6668E8', '#2327DE', '#A023DE', '#D523DE', '#DE23A3', '#DE2384', '#DE2346', '#FC0313', '#FC2C03', '#FCF803']
                  };
   var div = document.getElementById('chart_div');
@@ -709,8 +727,9 @@ function drawRNTPChart(a,b,c,d,e,f,na,key){
     ]);
 
   var options = {'title':key+ '%'+na+': Monthly Rent',
-                 'width':350,
-                 'height':350};
+                'width':350,
+                'height':300,
+               'chartArea': {width: '80%'}};
   var div = document.getElementById('chart_div');
   var chartDiv = document.createElement('div');
   chartDiv.setAttribute("style", "display: inline-block;")
@@ -732,8 +751,10 @@ function drawMVChart(a,b,c,d,e,f,g,h,key) {
       ]);
 
     var options = {'title':key+': Year Moved into Properties',
-                   'width':350,
-                   'height':350};
+                  'width':350,
+                  'height':300,
+                  'legend': { position: "none" }
+                  };
     var div = document.getElementById('chart_div');
     var chartDiv = document.createElement('div');
     chartDiv.setAttribute("style", "display: inline-block;")
@@ -766,8 +787,9 @@ function drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,key){
 
   ]);
   var options = {'title':key+': Year Structure Built',
-                 'width':350,
-                 'height':350};
+                'width':350,
+                'height':300,
+               'chartArea': {width: '80%'}};
   var div = document.getElementById('chart_div');
   var chartDiv = document.createElement('div');
   chartDiv.setAttribute("style", "display: inline-block;")
@@ -789,8 +811,9 @@ function drawNPChart(a,b,c,d,e,f,g,h,key){
     ]);
 
   var options = {'title':key+': Year Moved into Properties',
-                 'width':350,
-                 'height':350};
+                'width':350,
+                'height':300,
+               'chartArea': {width: '80%'}};
   var div = document.getElementById('chart_div');
   var chartDiv = document.createElement('div');
   chartDiv.setAttribute("style", "display: inline-block;")
@@ -802,21 +825,23 @@ function drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotA
   var data = new google.visualization.arrayToDataTable([
        ['Time', 'value', { role: 'style' }],
        ['Married Couple Household', marriedCouple, '#b87333'],            // RGB value
-       ['Male Family Household (No Wife Present)', maleHouse, 'purple'],
-       ['Female Family Household(No Husband Present)', femaleHouse, 'green'],
-       ['Male Householder, Living ALone', maleAlone, 'blue'],
-       ['Male Householder, Not Living Alone', maleNotAlone, 'yellow'],
-       ['Female Householder, Living Alone', femaleAlone, 'red'],
-       ['Female Householder, Not Living Alone', femaleNotAlone, 'black'],
+       ['Male Family Household', maleHouse, 'purple'],
+       ['Female Family Household', femaleHouse, 'green'],
+       ['Male House holder, Living ALone', maleAlone, 'blue'],
+       ['Male House holder, Not Living Alone', maleNotAlone, 'yellow'],
+       ['Female House holder, Living Alone', femaleAlone, 'red'],
+       ['Female House holder, Not Living Alone', femaleNotAlone, 'black'],
        ['Vacant', vacant, 'gold'],
     ]);
 
   var options = {'title':key+': Year Moved into Properties',
-                 'width':350,
-                 'height':350};
+                 'width':400,
+                 'height':350,
+                 'legend': {position: 'right', textStyle: {fontSize: 11}},
+                 'chartArea': {width: '80%', height: '85%'}};
   var div = document.getElementById('chart_div');
   var chartDiv = document.createElement('div');
-  chartDiv.setAttribute("style", "display: inline-block;")
+  chartDiv.setAttribute("style", "display: inline-block; width: 400; height: 300;")
   div.appendChild(chartDiv);
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
@@ -860,8 +885,9 @@ function drawMULTGChart(no, yes, vacant, key){
 
   // Set chart options
   var options = {'title':key+': Multigenerational Households',
-                 'width':400,
-                 'height':300};
+                'width':350,
+                'height':300,
+               'chartArea': {width: '80%'}};
 
   // Instantiate and draw our chart, passing in some options.
   var div = document.getElementById('chart_div');
@@ -885,8 +911,9 @@ function drawHINCPChart(a,b,c,d,e,f,g,h,key){
     ]);
 
   var options = {'title':key+': Year Moved into Properties',
-                 'width':350,
-                 'height':350};
+                'width':350,
+                'height':300,
+               'chartArea': {width: '80%'}};
   var div = document.getElementById('chart_div');
   var chartDiv = document.createElement('div');
   chartDiv.setAttribute("style", "display: inline-block;")
@@ -907,8 +934,9 @@ function drawHHLChart(eng, span, indeu, asian, other, key) {
 
     ]);
     var options = {'title':key+': Distribution of Household Languages',
-                   'width':350,
-                   'height':350};
+                  'width':350,
+                  'height':300,
+                 'chartArea': {width: '80%'}};
     var div = document.getElementById('chart_div');
     var chartDiv = document.createElement('div');
     chartDiv.setAttribute("style", "display: inline-block;")
@@ -930,8 +958,9 @@ function drawFSChart(no, yes, vac, key) {
 
     // Set chart options
     var options = {'title':key+': Percentage of Households using Food Stamps',
-                   'width':400,
-                   'height':300};
+                    'width':350,
+                    'height':300,
+                   'chartArea': {width: '80%'}};
 
     // Instantiate and draw our chart, passing in some options.
     var div = document.getElementById('chart_div');
@@ -959,7 +988,8 @@ function drawVACSChart(a,b,c,d,e,f,g,h,key) {
     ]);
     var options = {'title':key+': % Vacant = '+h,
                    'width':350,
-                   'height':350};
+                   'height':300,
+                  'chartArea': {width: '80%'}};
     var div = document.getElementById('chart_div');
     var chartDiv = document.createElement('div');
     chartDiv.setAttribute("style", "display: inline-block;")
@@ -980,8 +1010,9 @@ function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmpl
 
   ]);
   var options = {'title':key+': Employment',
-                 'width':350,
-                 'height':350};
+                'width':350,
+                'height':300,
+               'chartArea': {width: '80%'}};
   var div = document.getElementById('chart_div');
   var chartDiv = document.createElement('div');
   chartDiv.setAttribute("style", "display: inline-block;")
@@ -990,7 +1021,6 @@ function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmpl
   chart.draw(data, options);
 }
 
-//don't think this is doing anything
 function sendUpdateReq()
 {
     // alert( "SENDUPDATE" );
