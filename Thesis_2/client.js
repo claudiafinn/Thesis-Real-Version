@@ -2,6 +2,7 @@
 //var oneYear = true;
 //adding some comments
 //nothing exciting
+//another change
 var years =["2006","2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014"];
 var categories = [ {"Value": "VACS", "Display":"Vacancy Status"},{"Value": "FS", "Display":"Food Stamp"},
                 {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"},
