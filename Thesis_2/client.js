@@ -9,6 +9,9 @@ var categories = [ {"Value": "VACS", "Display":"Vacancy Status"},{"Value": "FS",
                 {"Value": "NP" , "Display" :"People per Household"},{"Value": "MULTG", "Display" :"Multigenerational Household"},
                 {"Value": "FPARC", "Display" :"Family Presence"},   {"Value": "WORKSTAT", "Display" :"Work Status"} ];
 var neighborhoods=[];
+var map;
+var windows=[];
+
 
 function onPageLoad()
 {
@@ -27,7 +30,7 @@ function onPageLoad()
 function initialize() {
 
   var minZoomLevel = 11;
-  var map = new google.maps.Map(document.getElementById('map'), {
+  map = new google.maps.Map(document.getElementById('map'), {
       zoom: minZoomLevel,
       center:{lat: 39.737760, lng: -105.000755},
   });
@@ -73,31 +76,27 @@ function initialize() {
 
 
   map.data.addListener('mouseover', function(event) {
-    map.data.revertStyle();
-    map.data.overrideStyle(event.feature, {strokeWeight: 6, fillOpacity : 0});
+  //  map.data.revertStyle();
+  //  map.data.overrideStyle(event.feature, {strokeWeight: 6, fillOpacity : 0});
   });
 
   var infowindow = new google.maps.InfoWindow();
 
   map.data.addListener('click', function(event) {
+    //delete old marker and window
     for(var i = 0; i < markers.length; i++){
        markers[i].setMap(null);
     }
     markers=[];
+    infowindow.close();
+    //create new marker and window
     var marker = new google.maps.Marker({position: event.latLng, map: map});
     markers.push(marker)
     var name  = event.feature.getProperty('name');
-    infowindow.close();
-    infowindow.setContent(name);
-    console.log(name);
-  //  for (var i = 0; i < markers.length; i++) {
-  //      markers[i].setMap(map);
-  //      infowindow.open(map, marker);
-  //    }
+    infowindow.setContent("<p style=\"color:black;\">"+name+"</p>");
     infowindow.open(map, marker);
     map.data.revertStyle();
-    map.data.overrideStyle(event.feature, {strokeWeight: 6, fillOpacity : 0});
-
+    map.data.overrideStyle(event.feature, {strokeWeight: 5, fillOpacity : .4, fillColor : '#ccffff'});
   });
 }
 
@@ -155,17 +154,23 @@ function getResults(){
 
 function onResponse( evt )
 {
+
   var chartDiv = document.getElementById('chart_div');
   while (chartDiv.hasChildNodes()) {
     chartDiv.removeChild(chartDiv.lastChild);
   }
-
   var jsonData=JSON.parse(evt.target.responseText);
 
-  var text = document.getElementById('testText');
-  text.innerHTML="";
+  for(var i=0; i<windows.length; i++){
+    windows[i].close();
+  }
+  windows=[];
+  var mapNeighborhood="";
+  var populationString="";
+  var marker;
   for(var puma in jsonData.neighborhoods){
     for (var neighborhood in jsonData.neighborhoods[puma]){
+      mapNeighborhood=neighborhood;
       var population =0;
       var population2000=0;
       for (census in jsonData.neighborhoods[puma][neighborhood]){
@@ -173,68 +178,111 @@ function onResponse( evt )
         population2000+=jsonData.neighborhoods[puma][neighborhood][census]["Population2000"];
       }
     }
-    text.innerHTML += puma+"Population 2010 : " +population + " Population 2000 : " +population2000;
-  }
+    populationString=" Population 2010 : " +population + "\r\n Population 2000 : " +population2000;
+    map.data.forEach(function(feature) {
+      if( neighborhood == feature.getProperty('name')){
+        var ifw = new google.maps.InfoWindow();
 
+        var coords = feature.getGeometry().getAt(0).getAt(0);
+        marker = new google.maps.Marker({position: coords, map: map});
+
+        ifw.setContent("<p style=\"color:black;\">"+mapNeighborhood+"</p>"+
+                              "<p style=\"color:black;\">"+ populationString+"</p>"
+                                );
+        ifw.open(map, marker);
+        windows.push(ifw);
+        map.data.overrideStyle(feature, {strokeWeight: 5, fillOpacity : .4, fillColor : '#ccffff'});
+      }
+    });
+  }
   for (var puma in jsonData.dataList){
     for (var year in jsonData.dataList[puma]){
       if (jsonData.dataType=="VALP"){
-        VALP(jsonData.dataList[puma][year], puma );
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        VALP(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="TAXP"){
-        TAXP(jsonData.dataList[puma][year], puma );;
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        TAXP(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="RNTP"){
-        RNTP(jsonData.dataList[puma][year], puma );;
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        RNTP(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="MV"){
-        MV(jsonData.dataList[puma][year], puma );
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        MV(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="YBL"){
-        YBL(jsonData.dataList[puma][year], puma );;
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        YBL(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="NP"){
-        NP(jsonData.dataList[puma][year], puma );;
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        NP(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="HHT"){
-        HHT(jsonData.dataList[puma][year], puma );
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        HHT(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="FPARC"){
-        FPARC(jsonData.dataList[puma][year], puma );;
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        FPARC(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="WORKSTAT"){
-        WORKSTAT(jsonData.dataList[puma][year], puma );;
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        WORKSTAT(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="MULTG"){
         if(year==2006 || year==2007 ){
           console.log('doenst exist')
         }
         else{
-          MULTG(jsonData.dataList[puma][year], puma );
+          var key =""
+          for (key2 in jsonData.neighborhoods[puma]){key=key2}
+          MULTG(jsonData.dataList[puma][year], year, key);
         }
       }
       if (jsonData.dataType=="HINCP"){
-        HINCP(jsonData.dataList[puma][year], puma );;
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        HINCP(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="HHL"){
-        HHL(jsonData.dataList[puma][year], puma );
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        HHL(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="FS"){
-        FS(jsonData.dataList[puma][year], puma );
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        FS(jsonData.dataList[puma][year], year, key);
       }
       if(jsonData.dataType=="VACS"){
-        VACS(jsonData.dataList[puma][year], puma );
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        VACS(jsonData.dataList[puma][year], year, key);
       }
       if (jsonData.dataType=="FINCP"){
-        FINCP(jsonData.dataList[puma][year], puma );;
+        var key =""
+        for (key2 in jsonData.neighborhoods[puma]){key=key2}
+        FINCP(jsonData.dataList[puma][year], year, key);
       }
 
     }
   }
 }
 
-
-function VALP(info, key){
+function VALP(info, year, neighborhood){
   var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0; var j=0; var k=0; var l=0; var m=0; var n=0;
   var na=0;
   for(var i=0; i<info.length; i++){
@@ -282,12 +330,12 @@ function VALP(info, key){
       na++;
     }
   }
-  drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key);
+  drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,year, neighborhood);
 }
 function TAXP(info, key){
   //range corresponding to dollar amt
 }
-function RNTP(info, key){
+function RNTP(info, year, neighborhood){
   //dollar amount
   var a=0; var b=0; var c=0; var d=0; var e=0;var f=0; var na=0;
   for(var i =0; i<info.length; i++){
@@ -315,9 +363,9 @@ function RNTP(info, key){
     }
   }
   var percentForRent = 100 - (na/(a+b+c+d+e+f+na));
-  drawRNTPChart(a,b,c,d,e,f,percentForRent, key);
+  drawRNTPChart(a,b,c,d,e,f,percentForRent, year, neighborhood);
 }
-function MV(info, key){
+function MV(info,  year, neighborhood){
   var a=0;
   var b=0;
   var c=0;
@@ -353,9 +401,9 @@ function MV(info, key){
 
     }
   }
-  drawMVChart(a,b,c,d,e,f,g,h,key);
+  drawMVChart(a,b,c,d,e,f,g,h,year, neighborhood);
 }
-function YBL(info, key){
+function YBL(info,  year, neighborhood){
   var a=0;
   var b=0;
   var c=0;
@@ -427,9 +475,9 @@ function YBL(info, key){
       a++;
     }
   }
-  drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,key);
+  drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,year, neighborhood);
 }
-function NP(info, key){
+function NP(info,  year, neighborhood){
   var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0;
   for(var i=0; i<info.length; i++){
     if(info[i]==1){
@@ -457,9 +505,9 @@ function NP(info, key){
       h++
     }
   }
-  drawNPChart(a,b,c,d,e,f,g,h,key);
+  drawNPChart(a,b,c,d,e,f,g,h,year, neighborhood);
 }
-function FPARC(info, key){
+function FPARC(info,  year, neighborhood){
   var under5 =0
   var over5 = 0;
   var both =0;
@@ -482,9 +530,9 @@ function FPARC(info, key){
       vacant++;
     }
   }
-  drawFPARCChart(under5, over5, both, neither, vacant, key);
+  drawFPARCChart(under5, over5, both, neither, vacant, year, neighborhood);
 }
-function MULTG(info, key){
+function MULTG(info,  year, neighborhood){
   var yes=0;
   var no=0;
   var vacant=0;
@@ -499,9 +547,9 @@ function MULTG(info, key){
       vacant++;
     }
   }
-  drawMULTGChart(no, yes, vacant, key);
+  drawMULTGChart(no, yes, vacant, year, neighborhood);
 }
-function HINCP(info, key){
+function HINCP(info,  year, neighborhood){
   var a=0; var b=0; var c=0; var d=0; var e=0; var f=0; var g=0; var h=0;
   for (var i=0; i<info.length; i++){
     if (info[i]<10,000){
@@ -529,9 +577,9 @@ function HINCP(info, key){
       h++;
     }
   }
-  drawHINCPChart(a,b,c,d,e,f,g,h,key);
+  drawHINCPChart(a,b,c,d,e,f,g,h,year, neighborhood);
 }
-function HHL(info, key){
+function HHL(info,  year, neighborhood){
     var english =0;
     var spanish=0;
     var indeu=0;
@@ -554,10 +602,10 @@ function HHL(info, key){
         other++;
       }
     }
-    drawHHLChart(english,spanish,indeu,asian,other, key);
+    drawHHLChart(english,spanish,indeu,asian,other, year, neighborhood);
 
 }
-function FS(info, key){
+function FS(info,  year, neighborhood){
   var totalYes=0;
   var totalNo=0;
   var totalVacant=0;
@@ -572,11 +620,9 @@ function FS(info, key){
       totalVacant++;
     }
   }
-  drawFSChart(totalNo, totalYes, totalVacant, key);
+  drawFSChart(totalNo, totalYes, totalVacant, year, neighborhood);
 }
-function VACS(info, key){
-  console.log('vacs')
-
+function VACS(info,  year, neighborhood){
   var a=0;
   var b=0;
   var c=0;
@@ -612,10 +658,10 @@ function VACS(info, key){
 
     }
   }
-  var percentVacant=100 - ((h)/(a+b+c+d+e+f+g+h));
-  drawVACSChart(a,b,c,d,e,f,g,percentVacant,key);
+  var percentVacant=Math.round(100 - ((h)/(a+b+c+d+e+f+g+h)));
+  drawVACSChart(a,b,c,d,e,f,g,percentVacant,year, neighborhood);
 }
-function HHT(info, key){
+function HHT(info,  year, neighborhood){
   var marriedCouple=0;
   var maleHouse=0;
   var femaleHouse=0;
@@ -650,9 +696,9 @@ function HHT(info, key){
       vacant++;
     }
   }
-  drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotAlone, femaleAlone, femaleNotAlone, vacant, key);
+  drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotAlone, femaleAlone, femaleNotAlone, vacant, year, neighborhood);
 }
-function WORKSTAT(info, key){
+function WORKSTAT(info,  year, neighborhood){
   var bothEmployed=0;
   var oneEmployed=0;
   var bothUnemployed=0;
@@ -675,10 +721,10 @@ function WORKSTAT(info, key){
       singleUnemployed++;
     }
   }
-  drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmployed, singleUnemployed, key);
+  drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmployed, singleUnemployed, year, neighborhood);
 }
 
-function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key){
+function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,year,neighborhood){
   var data = new google.visualization.arrayToDataTable([
        ['Time', 'value', { role: 'style' }],
        ['<$14,999', a, '#94DFF7'],            // RGB value
@@ -697,7 +743,7 @@ function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key){
 
     ]);
 
-  var options = {'title':key+': Year Moved into Properties',
+  var options = {'title':year+' '+neighborhood+':Property Value',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'},
@@ -713,7 +759,7 @@ function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,key){
 function drawTAXPChart(){
   //
 }
-function drawRNTPChart(a,b,c,d,e,f,na,key){
+function drawRNTPChart(a,b,c,d,e,f,na,year,neighborhood){
   var data = new google.visualization.arrayToDataTable([
        ['Time', 'value', { role: 'style' }],
        ['$0-$299', a, '#94DFF7'],            // RGB value
@@ -726,7 +772,7 @@ function drawRNTPChart(a,b,c,d,e,f,na,key){
 
     ]);
 
-  var options = {'title':key+ '%'+na+': Monthly Rent',
+  var options = {'title':year+' '+neighborhood+': Monthly Rent',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'}};
@@ -737,7 +783,7 @@ function drawRNTPChart(a,b,c,d,e,f,na,key){
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
-function drawMVChart(a,b,c,d,e,f,g,h,key) {
+function drawMVChart(a,b,c,d,e,f,g,h,year,neighborhood) {
     var data = new google.visualization.arrayToDataTable([
          ['Time', 'value', { role: 'style' }],
          ['<12 Months', a, '#b87333'],            // RGB value
@@ -750,7 +796,7 @@ function drawMVChart(a,b,c,d,e,f,g,h,key) {
          ['Vacant', h, 'gold'],
       ]);
 
-    var options = {'title':key+': Year Moved into Properties',
+    var options = {'title':year+' '+neighborhood+': Year Moved into Properties',
                   'width':350,
                   'height':300,
                   'legend': { position: "none" }
@@ -762,7 +808,7 @@ function drawMVChart(a,b,c,d,e,f,g,h,key) {
     var chart = new google.visualization.ColumnChart(chartDiv);
     chart.draw(data, options);
   }
-function drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,key){
+function drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,year,neighborhood){
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Topping');
   data.addColumn('number', 'Slices');
@@ -786,7 +832,7 @@ function drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,key){
     ['1939 or earlier', q],
 
   ]);
-  var options = {'title':key+': Year Structure Built',
+  var options = {'title':year+' '+neighborhood+': Year Structure Built',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'}};
@@ -797,7 +843,7 @@ function drawYBLChart(a,b,c,d,e,f,g,h,x,j,k,l,m,n,o,p,q,key){
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
-function drawNPChart(a,b,c,d,e,f,g,h,key){
+function drawNPChart(a,b,c,d,e,f,g,h,year,neighborhood){
   var data = new google.visualization.arrayToDataTable([
        ['Time', 'value', { role: 'style' }],
        ['1', a, '#b87333'],            // RGB value
@@ -810,7 +856,7 @@ function drawNPChart(a,b,c,d,e,f,g,h,key){
        ['8+', h, 'gold'],
     ]);
 
-  var options = {'title':key+': Year Moved into Properties',
+  var options = {'title':year+' '+neighborhood+': Year Moved into Properties',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'}};
@@ -821,7 +867,7 @@ function drawNPChart(a,b,c,d,e,f,g,h,key){
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
-function drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotAlone, femaleAlone, femaleNotAlone, vacant, key){
+function drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotAlone, femaleAlone, femaleNotAlone, vacant, year,neighborhood){
   var data = new google.visualization.arrayToDataTable([
        ['Time', 'value', { role: 'style' }],
        ['Married Couple Household', marriedCouple, '#b87333'],            // RGB value
@@ -834,7 +880,7 @@ function drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotA
        ['Vacant', vacant, 'gold'],
     ]);
 
-  var options = {'title':key+': Year Moved into Properties',
+  var options = {'title':year+' '+neighborhood+': Year Moved into Properties',
                  'width':400,
                  'height':350,
                  'legend': {position: 'right', textStyle: {fontSize: 11}},
@@ -846,7 +892,7 @@ function drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotA
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
-function drawFPARCChart(under5, over5, both, neither, vacant, key){
+function drawFPARCChart(under5, over5, both, neither, vacant, year,neighborhood){
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Topping');
   data.addColumn('number', 'Slices');
@@ -860,7 +906,7 @@ function drawFPARCChart(under5, over5, both, neither, vacant, key){
   ]);
 
   // Set chart options
-  var options = {'title':key+': Distribution of Households with Children',
+  var options = {'title':year+' '+neighborhood+': Distribution of Households with Children',
                  'width':400,
                  'height':300};
 
@@ -872,7 +918,7 @@ function drawFPARCChart(under5, over5, both, neither, vacant, key){
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
-function drawMULTGChart(no, yes, vacant, key){
+function drawMULTGChart(no, yes, vacant, year,neighborhood){
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Topping');
   data.addColumn('number', 'Slices');
@@ -884,7 +930,7 @@ function drawMULTGChart(no, yes, vacant, key){
   ]);
 
   // Set chart options
-  var options = {'title':key+': Multigenerational Households',
+  var options = {'title':year+' '+neighborhood+': Multigenerational Households',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'}};
@@ -897,7 +943,7 @@ function drawMULTGChart(no, yes, vacant, key){
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
-function drawHINCPChart(a,b,c,d,e,f,g,h,key){
+function drawHINCPChart(a,b,c,d,e,f,g,h,year,neighborhood){
   var data = new google.visualization.arrayToDataTable([
        ['Time', 'value', { role: 'style' }],
        ['<$10,000', a, '#b87333'],            // RGB value
@@ -910,7 +956,7 @@ function drawHINCPChart(a,b,c,d,e,f,g,h,key){
        ['>$650,000', h, 'gold'],
     ]);
 
-  var options = {'title':key+': Year Moved into Properties',
+  var options = {'title':year+' '+neighborhood+': Year Moved into Properties',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'}};
@@ -921,7 +967,7 @@ function drawHINCPChart(a,b,c,d,e,f,g,h,key){
   var chart = new google.visualization.PieChart(chartDiv);
   chart.draw(data, options);
 }
-function drawHHLChart(eng, span, indeu, asian, other, key) {
+function drawHHLChart(eng, span, indeu, asian, other, year,neighborhood) {
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Topping');
     data.addColumn('number', 'Slices');
@@ -933,7 +979,7 @@ function drawHHLChart(eng, span, indeu, asian, other, key) {
       ['Other', other],
 
     ]);
-    var options = {'title':key+': Distribution of Household Languages',
+    var options = {'title':year+' '+neighborhood+': Distribution of Household Languages',
                   'width':350,
                   'height':300,
                  'chartArea': {width: '80%'}};
@@ -944,7 +990,7 @@ function drawHHLChart(eng, span, indeu, asian, other, key) {
     var chart = new google.visualization.PieChart(chartDiv);
     chart.draw(data, options);
   }
-function drawFSChart(no, yes, vac, key) {
+function drawFSChart(no, yes, vac, year,neighborhood) {
         // Create the data table.
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Topping');
@@ -957,7 +1003,7 @@ function drawFSChart(no, yes, vac, key) {
     ]);
 
     // Set chart options
-    var options = {'title':key+': Percentage of Households using Food Stamps',
+    var options = {'title':year+' '+neighborhood+': Percentage of Households using Food Stamps',
                     'width':350,
                     'height':300,
                    'chartArea': {width: '80%'}};
@@ -970,7 +1016,7 @@ function drawFSChart(no, yes, vac, key) {
     var chart = new google.visualization.PieChart(chartDiv);
     chart.draw(data, options);
   }
-function drawVACSChart(a,b,c,d,e,f,g,h,key) {
+function drawVACSChart(a,b,c,d,e,f,g,h,year,neighborhood) {
     // TODO NEED A DIFFERENT CHART
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Reason');
@@ -986,7 +1032,7 @@ function drawVACSChart(a,b,c,d,e,f,g,h,key) {
       //['Occupied', h],
 
     ]);
-    var options = {'title':key+': % Vacant = '+h,
+    var options = {'title':year+' '+neighborhood+': % Vacant = '+h,
                    'width':350,
                    'height':300,
                   'chartArea': {width: '80%'}};
@@ -997,7 +1043,7 @@ function drawVACSChart(a,b,c,d,e,f,g,h,key) {
     var chart = new google.visualization.PieChart(chartDiv);
     chart.draw(data, options);
   }
-function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmployed, singleUnemployed, key){
+function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmployed, singleUnemployed, year,neighborhood){
   var data = new google.visualization.DataTable();
   data.addColumn('string', 'Topping');
   data.addColumn('number', 'percentage');
@@ -1009,7 +1055,7 @@ function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmpl
     ['Single Household, Unemployed', singleUnemployed],
 
   ]);
-  var options = {'title':key+': Employment',
+  var options = {'title':year+' '+neighborhood+': Employment',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'}};
@@ -1021,15 +1067,13 @@ function drawWORKSTATChart(bothEmployed, oneEmployed, bothUnemployed, singleEmpl
   chart.draw(data, options);
 }
 
-function sendUpdateReq()
-{
+function sendUpdateReq(){
     // alert( "SENDUPDATE" );
     var xhr = new XMLHttpRequest();
     xhr.addEventListener( "load", onResponse );
     xhr.open( "get", "idk?", true );
     xhr.send();
 }
-
 
 function addNeighborhood(){
   var div = document.getElementById( 'puma_container' );
