@@ -1,13 +1,9 @@
 
-//var oneYear = true;
-//adding some comments
-//nothing exciting
-//another change
 var years =["2006","2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014"];
 var categories = [ {"Value": "VACS", "Display":"Vacancy Status"},{"Value": "FS", "Display":"Food Stamp"},
                 {"Value": "RNTP", "Display":"Monthly Rent"}, {"Value": "HHL", "Display":"Household Language"},
                 {"Value": "MV", "Display":"Years Lived"},{"Value": "YBL", "Display":"Year Built"},
-                {"Value": "VALP", "Display":"Property Value"},{"Value": "TAXP", "Display":"Property Taxes"},
+                {"Value": "VALP", "Display":"Property Value"},
                 {"Value": "HHT", "Display":"Household Type"},{"Value": "HINCP", "Display":"Household Income"},
                 {"Value": "NP" , "Display" :"People per Household"},{"Value": "MULTG", "Display" :"Multigenerational Household"},
                 {"Value": "FPARC", "Display" :"Family Presence"},   {"Value": "WORKSTAT", "Display" :"Work Status"} ];
@@ -39,7 +35,8 @@ function initialize() {
   });
   var markers=[];
 
-  map.data.loadGeoJson('http://107.170.191.117:8080/neighborhoods.json');
+  map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
+//  map.data.loadGeoJson('http://107.170.191.117:8080/neighborhoods.json');
 
   //credit Tushar Gupta
   map.data.setStyle({
@@ -76,7 +73,6 @@ function initialize() {
   google.maps.event.addListener(map, 'zoom_changed', function () {
       if (map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
   });
-
 
   map.data.addListener('mouseover', function(event) {
   //  map.data.revertStyle();
@@ -185,10 +181,8 @@ function onResponse( evt )
     map.data.forEach(function(feature) {
       if( neighborhood == feature.getProperty('name')){
         var ifw = new google.maps.InfoWindow();
-
         var coords = feature.getGeometry().getAt(0).getAt(0);
         marker = new google.maps.Marker({position: coords, map: map});
-
         ifw.setContent("<p style=\"color:black;\">"+mapNeighborhood+"</p>"+
                               "<p style=\"color:black;\">"+ populationString+"</p>"
                                 );
@@ -248,6 +242,8 @@ function onResponse( evt )
       if (jsonData.dataType=="MULTG"){
         if(year==2006 || year==2007 ){
           console.log('doenst exist')
+          var text = document.getElementById('testText');
+          text.innerHTML="Multigenerational data does not exist for 2006 and 2007";
         }
         else{
           var key =""
@@ -729,20 +725,20 @@ function WORKSTAT(info,  year, neighborhood){
 
 function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,year,neighborhood){
   var data = new google.visualization.arrayToDataTable([
-       ['Time', 'value', { role: 'style' }],
-       ['<$14,999', a, '#94DFF7'],            // RGB value
-       ['$15,000-$24,999', b, '#68C4E3'],
-       ['$25,000-$34,999', c, '#1A27DB'],
-       ['$35,000-$49,999', d, '#711ADB'],
-       ['$50,000-$69,999', e, '#AA28EB'],
-       ['$70,000-$89,999', f, '#DA28EB'],
-       ['$90,000-$124,999', g, '#EB28A6'],
-       ['$125,000-$174,999', h, '#EB283F'],
-       ['$175,000-$249,999', j, '#F2780C'],
-       ['$250,000-$399,999', k, '#F2AD0C'],
-       ['$400,000-$749,999', l, '#F2EE0C'],
-       ['$750,000-$1,000,000', m, '#9EF20C'],
-       ['$1,000,000+', n, '#0CF210'],
+       ['Time', 'value'],//, { role: 'style' }],
+       ['<$14,999', a],//, '#94DFF7'],            // RGB value
+       ['$15,000-$24,999', b],//, '#68C4E3'],
+       ['$25,000-$34,999', c],//, '#1A27DB'],
+       ['$35,000-$49,999', d],//, '#711ADB'],
+       ['$50,000-$69,999', e],//, '#AA28EB'],
+       ['$70,000-$89,999', f],//, '#DA28EB'],
+       ['$90,000-$124,999', g],//, '#EB28A6'],
+       ['$125,000-$174,999', h],//, '#EB283F'],
+       ['$175,000-$249,999', j],//, '#F2780C'],
+       ['$250,000-$399,999', k],//, '#F2AD0C'],
+       ['$400,000-$749,999', l],//, '#F2EE0C'],
+       ['$750,000-$1,000,000', m],//, '#9EF20C'],
+       ['$1,000,000+', n],//, '#0CF210'],
 
     ]);
 
@@ -750,7 +746,7 @@ function drawVALPChart(na,a,b,c,d,e,f,g,h,j,k,l,m,n,year,neighborhood){
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'},
-                 colors: ['#ACADE8', '#8182E6', '#6668E8', '#2327DE', '#A023DE', '#D523DE', '#DE23A3', '#DE2384', '#DE2346', '#FC0313', '#FC2C03', '#FCF803']
+                // colors: ['#ACADE8', '#8182E6', '#6668E8', '#2327DE', '#A023DE', '#D523DE', '#DE23A3', '#DE2384', '#DE2346', '#FC0313', '#FC2C03', '#FCF803']
                  };
   var div = document.getElementById('chart_div');
   var chartDiv = document.createElement('div');
@@ -859,7 +855,7 @@ function drawNPChart(a,b,c,d,e,f,g,h,year,neighborhood){
        ['8+', h, 'gold'],
     ]);
 
-  var options = {'title':year+' '+neighborhood+': Year Moved into Properties',
+  var options = {'title':year+' '+neighborhood+': People per Household',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'}};
@@ -883,7 +879,7 @@ function drawHHTChart(marriedCouple, maleHouse, femaleHouse, maleAlone, maleNotA
        ['Vacant', vacant, 'gold'],
     ]);
 
-  var options = {'title':year+' '+neighborhood+': Year Moved into Properties',
+  var options = {'title':year+' '+neighborhood+': Household Type',
                  'width':400,
                  'height':350,
                  'legend': {position: 'right', textStyle: {fontSize: 11}},
@@ -959,7 +955,7 @@ function drawHINCPChart(a,b,c,d,e,f,g,h,year,neighborhood){
        ['>$650,000', h, 'gold'],
     ]);
 
-  var options = {'title':year+' '+neighborhood+': Year Moved into Properties',
+  var options = {'title':year+' '+neighborhood+': Household Income',
                 'width':350,
                 'height':300,
                'chartArea': {width: '80%'}};
@@ -1006,7 +1002,7 @@ function drawFSChart(no, yes, vac, year,neighborhood) {
     ]);
 
     // Set chart options
-    var options = {'title':year+' '+neighborhood+': Percentage of Households using Food Stamps',
+    var options = {'title':year+' '+neighborhood+': Households using Food Stamps',
                     'width':350,
                     'height':300,
                    'chartArea': {width: '80%'}};

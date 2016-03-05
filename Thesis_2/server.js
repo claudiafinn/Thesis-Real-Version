@@ -4,11 +4,6 @@ var sql = require( 'sqlite3' ).verbose();
 var serveStatic = require('serve-static');
 var qs = require( 'querystring' );
 
-
-//my code compile repo ben /source/dmcc_server.js
-//serveStatic library node will do all this
-
-
 function serveDynamic( req, res )
 {
     var qs_params = qs.parse( req.url.split( "?" )[ 1 ] );
