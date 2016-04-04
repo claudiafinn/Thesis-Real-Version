@@ -35,12 +35,11 @@ function initialize() {
   });
   var markers=[];
 
-  //map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
-  map.data.loadGeoJson('http://107.170.191.117:8080/neighborhoods.json');
+  map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
+//  map.data.loadGeoJson('http://107.170.191.117:8080/neighborhoods.json');
 
   //credit Tushar Gupta
   map.data.setStyle({
-    //fillColor: 'grey',
     strokeWeight: 3,
     strokeColor : 'grey',
     fillOpacity : 0
