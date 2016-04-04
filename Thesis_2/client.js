@@ -35,8 +35,8 @@ function initialize() {
   });
   var markers=[];
 
-  map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
-//  map.data.loadGeoJson('http://107.170.191.117:8080/neighborhoods.json');
+  //map.data.loadGeoJson('http://localhost:8080/neighborhoods.json');
+  map.data.loadGeoJson('http://107.170.191.117:8080/neighborhoods.json');
 
   //credit Tushar Gupta
   map.data.setStyle({
@@ -115,6 +115,7 @@ function onLoadResponse(evt){
   var xhr = evt.target;
   var jsonData=JSON.parse(xhr.responseText);
   neighborhoods=jsonData.puma_list;
+  console.log(neighborhoods.length);
   for (var i=0; i<jsonData.puma_list.length; i++){
     dropDown1.options.add( new Option(jsonData.puma_list[i]) );
   }
