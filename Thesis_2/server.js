@@ -17,7 +17,7 @@ function serveDynamic( req, res )
         var data="";
         var db = new sql.Database( 'Thesis_data/thesis_data.sqlite' );
 
-        var sqlString1 = "SELECT * FROM NEIGHBORHOODS WHERE ";
+        var sqlString1 = "SELECT DISTINCT * FROM NEIGHBORHOODS WHERE ";
         var sqlString1List = [];
         if(neighborhood2==" "){
           sqlString1+="Neighborhood = ? "
